@@ -22,7 +22,8 @@ Phase 1 delivers a production-oriented foundation:
 - `apps/api` - Hono Policy Kernel API
 - `apps/cli` - Node CLI tooling via Commander
 - `packages/sdk` - Shared TypeScript SDK
-- `packages/db` - Drizzle ORM schema + better-sqlite3 client
+- `packages/db` - Drizzle ORM schema + local SQLite (`@libsql/client`) client
+- `apps/examples/yolo-agent` - zero-cost OpenAI integration simulation with real policy enforcement
 
 ## Quick Start
 
@@ -52,12 +53,38 @@ pnpm --filter @limitrum/cli dev -- simulate
 import { LimitrumGuard } from "@limitrum/sdk";
 
 const guard = new LimitrumGuard();
-const verdict = guard.verify({
+const verdict = await guard.verify({
+  agentId: "agent_sales_01",
   action: "fetch",
   target: "api.openai.com/v1/chat/completions",
+  amount: 2.5,
   estimatedCostUsd: 2.5,
 });
 ```
+
+## Real-World LLM Adapter (Zero-Cost Simulation)
+
+`@limitrum/sdk` includes an OpenAI adapter that wraps `chat.completions.create` and intercepts tool calls before execution.
+
+- `withLimitrum(openaiClient, guard, { agentId })` inspects tool calls from the LLM response
+- each tool call is validated by `guard.verify(...)`
+- if blocked, Limitrum injects a system message back to the model:
+  - `Limitrum Policy Enforcement: Action blocked because <reason>`
+- no tool is executed when policy blocks the action
+
+Run the local zero-cost demonstration:
+
+```bash
+pnpm --filter @limitrum/db seed
+pnpm --filter @limitrum/example-yolo-agent dev
+```
+
+This demo uses the official `openai` SDK but mocks network responses locally, so no API key spend is required.
+
+## Web CLI vs Real CLI
+
+- The web CLI in `@limitrum/web` is a visitor-facing visual simulation, so unknown commands can show "command not found".
+- The real executable CLI is `@limitrum/cli` and runs in your terminal (`pnpm --filter @limitrum/cli dev -- simulate`).
 
 ## Security & GitOps Baseline
 

@@ -65,6 +65,25 @@ importers:
         specifier: latest
         version: 5.9.3
 
+  apps/examples/yolo-agent:
+    dependencies:
+      '@limitrum/sdk':
+        specifier: workspace:*
+        version: link:../../../packages/sdk
+      openai:
+        specifier: latest
+        version: 6.25.0(ws@8.19.0)(zod@4.3.6)
+    devDependencies:
+      '@types/node':
+        specifier: latest
+        version: 25.3.3
+      tsx:
+        specifier: latest
+        version: 4.21.0
+      typescript:
+        specifier: latest
+        version: 5.9.3
+
   apps/web:
     dependencies:
       '@limitrum/sdk':
@@ -816,6 +835,9 @@ packages:
 
   '@types/node@25.3.2':
     resolution: {integrity: sha512-RpV6r/ij22zRRdyBPcxDeKAzH43phWVKEjL2iksqo1Vz3CuBUrgmPpPhALKiRfU7OMCmeeO9vECBMsV0hMTG8Q==}
+
+  '@types/node@25.3.3':
+    resolution: {integrity: sha512-DpzbrH7wIcBaJibpKo9nnSQL0MTRdnWttGyE5haGwK86xgMOkFLp7vEyfQPGLOJh5wNYiJ3V9PmUMDhV9u8kkQ==}
 
   '@types/react-dom@19.2.3':
     resolution: {integrity: sha512-jp2L/eY6fn+KgVVQAOqYItbF0VY/YApe5Mz2F0aykSO8gx31bYCZyvSeYxCHKvzHG5eZjc+zyaS5BrBWya2+kQ==}
@@ -2081,6 +2103,18 @@ packages:
   once@1.4.0:
     resolution: {integrity: sha512-lNaJgI+2Q5URQBkccEKHTQOPaXdUxnZZElQTZY0MFUAuaEqe1E+Nyvgdz/aIyNi6Z9MzO5dv1H8n58/GELp3+w==}
 
+  openai@6.25.0:
+    resolution: {integrity: sha512-mEh6VZ2ds2AGGokWARo18aPISI1OhlgdEIC1ewhkZr8pSIT31dec0ecr9Nhxx0JlybyOgoAT1sWeKtwPZzJyww==}
+    hasBin: true
+    peerDependencies:
+      ws: ^8.18.0
+      zod: ^3.25 || ^4.0
+    peerDependenciesMeta:
+      ws:
+        optional: true
+      zod:
+        optional: true
+
   optionator@0.9.4:
     resolution: {integrity: sha512-6IpQ7mKUxRcZNLIObR0hz7lxsapSSIYNZJwXPGeF0mTVqGKFIXj1DQcMoT22S3ROcLyY/rz0PWaWZ9ayWmad9g==}
     engines: {node: '>= 0.8.0'}
@@ -3038,6 +3072,10 @@ snapshots:
       undici-types: 6.21.0
 
   '@types/node@25.3.2':
+    dependencies:
+      undici-types: 7.18.2
+
+  '@types/node@25.3.3':
     dependencies:
       undici-types: 7.18.2
 
@@ -4407,6 +4445,11 @@ snapshots:
     dependencies:
       wrappy: 1.0.2
     optional: true
+
+  openai@6.25.0(ws@8.19.0)(zod@4.3.6):
+    optionalDependencies:
+      ws: 8.19.0
+      zod: 4.3.6
 
   optionator@0.9.4:
     dependencies:
