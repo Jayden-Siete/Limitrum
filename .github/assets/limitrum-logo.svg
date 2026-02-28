@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 420 120" role="img" aria-labelledby="title desc">
+  <title id="title">Limitrum</title>
+  <desc id="desc">Limitrum logo mark and wordmark</desc>
+  <defs>
+    <linearGradient id="g" x1="0%" x2="100%" y1="0%" y2="100%">
+      <stop offset="0%" stop-color="#7c3aed" />
+      <stop offset="100%" stop-color="#22d3ee" />
+    </linearGradient>
+  </defs>
+  <rect x="8" y="8" width="104" height="104" rx="22" fill="#0b1020" />
+  <path
+    d="M60 24c-15 10-24 26-24 45 0 20 10 36 24 45 14-9 24-25 24-45 0-19-10-35-24-45zm0 15c8 7 13 17 13 30 0 13-5 23-13 30-8-7-13-17-13-30 0-13 5-23 13-30z"
+    fill="url(#g)"
+  />
+  <path d="M54 57h12v18H54z" fill="#22d3ee" />
+  <text x="132" y="70" fill="#e5e7eb" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="44" font-weight="700">
+    Limitrum
+  </text>
+  <text x="132" y="96" fill="#94a3b8" font-family="Inter, Segoe UI, Arial, sans-serif" font-size="16">
+    The safety engine for autonomous systems
+  </text>
+</svg>

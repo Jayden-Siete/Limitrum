@@ -1,133 +1,102 @@
 # Limitrum
 
-Limitrum is the open-source Policy Kernel and Risk Engine for autonomous AI agents.
+![Limitrum](.github/assets/limitrum-logo.svg)
 
-**Core promise:** deploy autonomous agents with absolute confidence.
+**The safety engine for autonomous systems.**  
+Deploy autonomous agents with deterministic policy enforcement, auditable decisions, and zero-cost local simulation.
 
-In a world of claws, build a shell.
+[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
+[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6)](https://www.typescriptlang.org/)
+[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
+[![Status: Beta](https://img.shields.io/badge/Status-Beta-orange)](#)
 
-## V1.4 Scope (Open Source)
+## Architecture
 
-V1.4 delivers a production-oriented universal foundation:
+```mermaid
+flowchart LR
+    Agent[AutonomousAgent] --> SDK[LimitrumSDK]
+    SDK --> Kernel[PolicyKernel]
+    Kernel --> Audit[SQLiteAuditLogs]
+```
 
-- `@limitrum/sdk`: deterministic guard contract (`verify(intent)`)
-- `@limitrum/mcp-server`: MCP server exposing `limitrum_guard` tool over stdio/SSE
-- `@limitrum/cli`: local simulation (`limitrum simulate`)
-- `@limitrum/api`: policy verification endpoint (`POST /v1/verify-intent`)
-- `@limitrum/db`: Drizzle schema + SQLite connection for local-first workflows
-- `@limitrum/web`: premium dark-mode landing + interactive sandbox
+## Why Limitrum?
 
-## Monorepo Structure
+- **Deterministic safety**: every tool/action intent is evaluated by explicit policy rules.
+- **Low overhead**: in-process policy checks keep latency low for critical agent loops.
+- **Privacy-first**: local SQLite + local simulation workflows avoid unnecessary third-party data exposure.
 
-- `apps/web` - Next.js App Router landing and interactive sandbox
-- `apps/api` - Hono Policy Kernel API
-- `apps/cli` - Node CLI tooling via Commander
-- `apps/mcp-server` - MCP server exposing `limitrum_guard` for MCP clients
-- `packages/sdk` - Shared TypeScript SDK
-- `packages/db` - Drizzle ORM schema + local SQLite (`@libsql/client`) client
-- `apps/examples/yolo-agent` - zero-cost OpenAI integration simulation with real policy enforcement
-- `apps/examples/mcp-agent` - zero-cost MCP client simulation against local MCP server
+## Monorepo Overview
 
-## Quick Start
+- `apps/web` - Next.js landing page + interactive sandbox
+- `apps/api` - Hono Policy Kernel API (`POST /v1/verify-intent`)
+- `apps/cli` - terminal CLI simulation (`limitrum simulate`)
+- `apps/mcp-server` - MCP server exposing `limitrum_guard` via stdio/SSE
+- `apps/examples/yolo-agent` - zero-cost OpenAI adapter simulation
+- `apps/examples/mcp-agent` - zero-cost MCP client simulation
+- `packages/sdk` - guard + universal adapters (OpenAI, Anthropic, LangChain)
+- `packages/db` - schema + local SQLite client
 
-1. Install dependencies
+## Quickstart
+
+### 1) Clone and install
 
 ```bash
+git clone https://github.com/Jayden-Siete/Limitrum.git
+cd Limitrum
 pnpm install
 ```
 
-2. Start all dev targets
-
-```bash
-pnpm dev
-```
-
-3. Or run each workspace directly
-
-```bash
-pnpm --filter @limitrum/web dev
-pnpm --filter @limitrum/api dev
-pnpm --filter @limitrum/cli dev -- simulate
-pnpm --filter @limitrum/mcp-server dev
-```
-
-## Example: SDK Guard
-
-```ts
-import { LimitrumGuard } from "@limitrum/sdk";
-
-const guard = new LimitrumGuard();
-const verdict = await guard.verify({
-  agentId: "agent_sales_01",
-  action: "fetch",
-  target: "api.openai.com/v1/chat/completions",
-  amount: 2.5,
-  estimatedCostUsd: 2.5,
-});
-```
-
-## Real-World LLM Adapter (Zero-Cost Simulation)
-
-`@limitrum/sdk` includes adapters for OpenAI, Anthropic, and LangChain integration points:
-
-- `withLimitrum(openaiClient, guard, { agentId })` inspects tool calls from the LLM response
-- `withLimitrumAnthropic(anthropicClient, guard, { agentId })` inspects Anthropic `tool_use` calls from `messages.create`
-- `withLimitrumTool(tool, guard, { agentId })` wraps a single LangChain-style tool
-- `withLimitrumToolkit(tools, guard, { agentId })` wraps an entire toolkit array automatically
-- each tool call is validated by `guard.verify(...)`
-- if blocked, Limitrum injects a system message back to the model:
-  - `Limitrum Policy Enforcement: Action blocked because <reason>`
-- no tool is executed when policy blocks the action
-
-Run the local zero-cost demonstration:
+### 2) Seed local policy data
 
 ```bash
 pnpm --filter @limitrum/db seed
+```
+
+### 3) Run the zero-cost YOLO agent example
+
+```bash
 pnpm --filter @limitrum/example-yolo-agent dev
 ```
 
-This demo uses the official `openai` SDK but mocks network responses locally, so no API key spend is required.
+This example simulates an LLM tool-call path locally and demonstrates enforcement without paid API usage.
 
-## MCP Server (Universal Client Support)
+## MCP Support
 
-`@limitrum/mcp-server` exposes one MCP tool:
+Limitrum provides a production-grade MCP server so any MCP client can consume policy enforcement as a tool.
 
-- `limitrum_guard` -> deterministic policy evaluation via `LimitrumGuard.verify(...)`
+- Tool: `limitrum_guard`
+- Transports:
+  - `stdio` (default)
+  - `SSE`
 
-Supported transports:
-
-- **stdio** (default): for local MCP clients (Cursor, Claude Desktop, Gemini CLI, Codex-compatible clients)
-- **SSE**: for HTTP/SSE MCP integrations
-
-Run MCP server:
+Run it:
 
 ```bash
 pnpm --filter @limitrum/mcp-server dev
 pnpm --filter @limitrum/mcp-server dev:sse
 ```
 
-Zero-cost MCP interaction demo:
+Run MCP simulation:
 
 ```bash
-pnpm --filter @limitrum/db seed
 pnpm --filter @limitrum/example-mcp-agent dev
 ```
 
-## Web CLI vs Real CLI
+## SDK Adapters
 
-- The web CLI in `@limitrum/web` is a visitor-facing visual simulation, so unknown commands can show "command not found".
-- The real executable CLI is `@limitrum/cli` and runs in your terminal (`pnpm --filter @limitrum/cli dev -- simulate`).
+- OpenAI: `withLimitrum(...)`
+- Anthropic: `withLimitrumAnthropic(...)`
+- LangChain tool: `withLimitrumTool(...)`
+- LangChain toolkit: `withLimitrumToolkit(...)`
 
-## Security & GitOps Baseline
+All adapters delegate to `LimitrumGuard.verify(...)` and apply hard policy-block responses consistently.
 
-- Branch model:
-  - `main` for releases/production
-  - `dev` for active engineering
-- Secrets policy:
-  - `.env*` files are ignored
-  - only `.env.example` files are tracked
-- Local databases (`*.sqlite`, `*.db*`) are ignored by default
+## Security
+
+- `.env` files are ignored; only `.env.example` is tracked.
+- local databases (`*.sqlite`, `*.db*`) are ignored.
+- report vulnerabilities via `SECURITY.md`.
 
 ## License
 
-This repository is intended for open-source distribution.
+MIT. See [LICENSE](LICENSE).
