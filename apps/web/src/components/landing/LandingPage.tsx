@@ -40,7 +40,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   const [selectedActions, setSelectedActions] = useState<string[]>(["charge-50"]);
   const [runningSimulation, setRunningSimulation] = useState(false);
   const [simulationResults, setSimulationResults] = useState<SimResult[]>([]);
-  const apiBaseUrl = process.env.NEXT_PUBLIC_LIMITRUM_API_URL ?? "http://localhost:8787";
+  const apiBaseUrl = process.env.NEXT_PUBLIC_LIMITRUM_API_URL ?? "http://localhost:8000";
 
   const cliCommands = useMemo(() => Object.keys(cliPresets), []);
   const [selectedCmd, setSelectedCmd] = useState("limitrum simulate");
@@ -114,6 +114,9 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
           decision?: "allowed" | "blocked";
           reason?: string;
         };
+        if (!response.ok) {
+          throw new Error(payload.reason ?? "Policy Kernel returned an error response.");
+        }
         const elapsed = Math.max(8, Math.round(performance.now() - startedAt));
         setSimulationResults((prev) => [
           ...prev,
@@ -126,20 +129,18 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
           },
         ]);
       } catch {
+        const elapsed = Math.max(8, Math.round(performance.now() - startedAt));
         setSimulationResults((prev) => [
           ...prev,
           {
             id: `${action.id}-${idx}`,
             type: "blocked",
             action: action.action,
-            reason: "Policy Kernel unavailable. Verify API is running on localhost:8787.",
-            latency: Math.floor(Math.random() * 20) + 8,
+            reason: "Policy Kernel unavailable. Verify API is running on localhost:8000.",
+            latency: elapsed,
           },
         ]);
       }
-      await new Promise<void>((resolve) => {
-        window.setTimeout(() => resolve(), 420);
-      });
     }
     setRunningSimulation(false);
   };

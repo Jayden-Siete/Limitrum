@@ -17,7 +17,12 @@ const verifyIntentRequestSchema = z.object({
   }),
 });
 
-app.use("*", cors());
+app.use(
+  "*",
+  cors({
+    origin: "*",
+  }),
+);
 
 app.get("/health", (c) => c.json({ ok: true, service: "limitrum-api" }));
 
@@ -47,6 +52,6 @@ app.post("/v1/verify-intent", async (c) => {
   });
 });
 
-const port = Number(process.env.PORT ?? 8787);
+const port = Number(process.env.PORT ?? 8000);
 serve({ fetch: app.fetch, port });
 console.log(`Limitrum API running on http://localhost:${port}`);
