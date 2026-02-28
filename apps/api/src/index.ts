@@ -42,6 +42,8 @@ app.post("/v1/verify-intent", async (c) => {
     reason: result.reason,
     traceId: `trace_${Date.now()}`,
     policyId: result.policyId ?? null,
+    cumulativeSpent: result.cumulativeSpent,
+    remainingBudget: result.remainingBudget,
   });
 });
 

@@ -1,7 +1,8 @@
 #!/usr/bin/env node
+import { randomUUID } from "node:crypto";
 import { Command } from "commander";
 import { LimitrumGuard } from "@limitrum/sdk";
-import { db, intentLogs } from "@limitrum/db";
+import { agents, db, intentLogs, organizations, policies } from "@limitrum/db";
 import { desc, eq } from "drizzle-orm";
 
 const program = new Command();
@@ -14,44 +15,29 @@ program
 
 program
   .command("simulate")
-  .description("Run real deterministic policy simulation")
-  .option("--agent-id <agentId>", "Agent identifier", "agent_sales_01")
+  .description("Run YOLO-agent cumulative budget simulation")
+  .option("--agent-id <agentId>", "Agent identifier")
   .action(async (opts) => {
-    const agentId = opts.agentId as string;
-    const scenarios = [
-      {
-        label: "Allowed action",
-        intent: {
-          agentId,
-          action: "openai.chat.completions.create",
-          target: "api.openai.com/v1/chat/completions",
-          amount: 12,
-          estimatedCostUsd: 12,
-        },
-      },
-      {
-        label: "Blocked action",
-        intent: {
-          agentId,
-          action: "fetch",
-          target: "api.unknown-exfil.io/data",
-          amount: 8,
-          estimatedCostUsd: 8,
-        },
-      },
-    ];
+    const agentId = (opts.agentId as string | undefined) ?? `agent_yolo_${randomUUID().slice(0, 8)}`;
+    await ensureYoloAgent(agentId);
 
-    for (const scenario of scenarios) {
+    console.log(`\nYOLO simulation for ${agentId}`);
+    console.log("Budget: $50.00 | 12 requests x $5.00 to api.openai.com");
+
+    for (let i = 1; i <= 12; i += 1) {
+      const startedAt = performance.now();
       const result = await guard.verify({
-        ...scenario.intent,
-        metadata: { source: "cli.simulate", scenario: scenario.label },
+        agentId,
+        action: "openai.chat.completions.create",
+        target: "api.openai.com/v1/chat/completions",
+        amount: 5,
+        estimatedCostUsd: 5,
+        metadata: { source: "cli.simulate", mode: "yolo", iteration: i },
       });
-      console.log(`\n[${result.decision.toUpperCase()}] ${scenario.label}`);
-      console.log(`Action: ${scenario.intent.action} -> ${scenario.intent.target}`);
-      console.log(`Reason: ${result.reason}`);
-      if (result.policyId) {
-        console.log(`Policy: ${result.policyId}`);
-      }
+      const latencyMs = Math.max(0.01, performance.now() - startedAt);
+      console.log(
+        `#${String(i).padStart(2, "0")} ${result.decision.toUpperCase()} | amount=$5.00 | latency=${latencyMs.toFixed(2)}ms | ${result.reason}`,
+      );
     }
 
     const latestLogs = await db
@@ -68,5 +54,52 @@ program
       );
     });
   });
+
+async function ensureYoloAgent(agentId: string) {
+  const now = Date.now();
+  const organizationId = "org_limitrum_demo";
+  const policyId = `policy_${agentId}`;
+  const allowlist = JSON.stringify(["api.stripe.com", "api.openai.com", "api.github.com"]);
+
+  await db
+    .insert(organizations)
+    .values({
+      id: organizationId,
+      name: "Limitrum Demo Org",
+      createdAt: now,
+    })
+    .onConflictDoNothing();
+
+  await db
+    .insert(agents)
+    .values({
+      id: agentId,
+      organizationId,
+      name: "YOLO Agent",
+      environment: "development",
+      status: "active",
+      createdAt: now,
+    })
+    .onConflictDoNothing();
+
+  await db
+    .insert(policies)
+    .values({
+      id: policyId,
+      agentId,
+      maxDailySpend: 50,
+      allowedEndpoints: allowlist,
+      createdAt: now,
+      updatedAt: now,
+    })
+    .onConflictDoUpdate({
+      target: policies.id,
+      set: {
+        maxDailySpend: 50,
+        allowedEndpoints: allowlist,
+        updatedAt: now,
+      },
+    });
+}
 
 program.parse(process.argv);

@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { eq } from "drizzle-orm";
+import { and, eq, gte, sql } from "drizzle-orm";
 import { db } from "@limitrum/db";
 import { intentLogs, policies } from "@limitrum/db";
 import { z } from "zod";
@@ -20,6 +20,8 @@ export type VerifyIntentResult = {
   decision: "allowed" | "blocked";
   reason: string;
   policyId?: string;
+  cumulativeSpent: number;
+  remainingBudget: number;
 };
 
 function normalizeTargetHost(target: string) {
@@ -41,9 +43,17 @@ function parseAllowlist(raw: string) {
     .map((entry) => entry.toLowerCase());
 }
 
+function getStartOfUtcDayTimestampMs(nowMs: number) {
+  const date = new Date(nowMs);
+  date.setUTCHours(0, 0, 0, 0);
+  return date.getTime();
+}
+
 export class LimitrumGuard {
   async verify(input: VerifyIntentInput): Promise<VerifyIntentResult> {
     const intent = verifyIntentInputSchema.parse(input);
+    const now = Date.now();
+    const amount = intent.amount ?? intent.estimatedCostUsd ?? 0;
 
     const policy = await db
       .select()
@@ -62,20 +72,38 @@ export class LimitrumGuard {
         target: intent.target,
         decision: "blocked",
         reason,
-        amount: intent.amount ?? intent.estimatedCostUsd ?? 0,
-        estimatedCostUsd: intent.estimatedCostUsd ?? intent.amount ?? 0,
-        createdAt: Date.now(),
+        amount,
+        estimatedCostUsd: intent.estimatedCostUsd ?? amount,
+        createdAt: now,
       });
       return {
         allowed: false,
         decision: "blocked",
         reason,
+        cumulativeSpent: 0,
+        remainingBudget: 0,
       };
     }
 
     const targetHost = normalizeTargetHost(intent.target);
     const allowedEndpoints = parseAllowlist(policy.allowedEndpoints);
-    const amount = intent.amount ?? intent.estimatedCostUsd ?? 0;
+    const startOfUtcDay = getStartOfUtcDayTimestampMs(now);
+    const aggregate = await db
+      .select({
+        total: sql<number>`coalesce(sum(${intentLogs.amount}), 0)`,
+      })
+      .from(intentLogs)
+      .where(
+        and(
+          eq(intentLogs.agentId, intent.agentId),
+          eq(intentLogs.decision, "allowed"),
+          gte(intentLogs.createdAt, startOfUtcDay),
+        ),
+      )
+      .then((rows) => rows[0]);
+
+    const cumulativeSpent = Number(aggregate?.total ?? 0);
+    const remainingBudget = Math.max(0, policy.maxDailySpend - cumulativeSpent);
 
     let decision: "allowed" | "blocked" = "allowed";
     let reason = "Intent accepted by deterministic policy kernel.";
@@ -83,9 +111,9 @@ export class LimitrumGuard {
     if (!allowedEndpoints.includes(targetHost)) {
       decision = "blocked";
       reason = `Domain '${targetHost}' is not allowlisted.`;
-    } else if (amount > policy.maxDailySpend) {
+    } else if (cumulativeSpent + amount > policy.maxDailySpend) {
       decision = "blocked";
-      reason = `Amount $${amount.toFixed(2)} exceeds max_daily_spend $${policy.maxDailySpend.toFixed(2)}.`;
+      reason = `Daily budget exceeded. Remaining: $${remainingBudget.toFixed(2)}. Requested: $${amount.toFixed(2)}.`;
     }
 
     await db.insert(intentLogs).values({
@@ -98,7 +126,7 @@ export class LimitrumGuard {
       reason,
       amount,
       estimatedCostUsd: intent.estimatedCostUsd ?? amount,
-      createdAt: Date.now(),
+      createdAt: now,
     });
 
     return {
@@ -106,6 +134,8 @@ export class LimitrumGuard {
       decision,
       reason,
       policyId: policy.id,
+      cumulativeSpent,
+      remainingBudget,
     };
   }
 }
