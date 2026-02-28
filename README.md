@@ -1,6 +1,10 @@
 # Limitrum
 
-![Limitrum](.github/assets/limitrum-logo.svg)
+<picture>
+  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/limitrum-logo-white.png">
+  <source media="(prefers-color-scheme: light)" srcset=".github/assets/limitrum-logo-dark.png">
+  <img alt="Limitrum" src=".github/assets/limitrum-logo-dark.png" width="520">
+</picture>
 
 **The safety engine for autonomous systems.**  
 Deploy autonomous agents with deterministic policy enforcement, auditable decisions, and zero-cost local simulation.
