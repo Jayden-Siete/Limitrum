@@ -1,0 +1,24 @@
+{
+  "name": "@limitrum/mcp-server",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx src/index.ts",
+    "dev:sse": "cross-env MCP_TRANSPORT=sse tsx src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@limitrum/sdk": "workspace:*",
+    "@modelcontextprotocol/sdk": "latest",
+    "cross-env": "latest",
+    "hono": "latest",
+    "@hono/node-server": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
+}

@@ -6,11 +6,12 @@ Limitrum is the open-source Policy Kernel and Risk Engine for autonomous AI agen
 
 In a world of claws, build a shell.
 
-## Phase 1 Scope (Open Source)
+## V1.4 Scope (Open Source)
 
-Phase 1 delivers a production-oriented foundation:
+V1.4 delivers a production-oriented universal foundation:
 
 - `@limitrum/sdk`: deterministic guard contract (`verify(intent)`)
+- `@limitrum/mcp-server`: MCP server exposing `limitrum_guard` tool over stdio/SSE
 - `@limitrum/cli`: local simulation (`limitrum simulate`)
 - `@limitrum/api`: policy verification endpoint (`POST /v1/verify-intent`)
 - `@limitrum/db`: Drizzle schema + SQLite connection for local-first workflows
@@ -21,9 +22,11 @@ Phase 1 delivers a production-oriented foundation:
 - `apps/web` - Next.js App Router landing and interactive sandbox
 - `apps/api` - Hono Policy Kernel API
 - `apps/cli` - Node CLI tooling via Commander
+- `apps/mcp-server` - MCP server exposing `limitrum_guard` for MCP clients
 - `packages/sdk` - Shared TypeScript SDK
 - `packages/db` - Drizzle ORM schema + local SQLite (`@libsql/client`) client
 - `apps/examples/yolo-agent` - zero-cost OpenAI integration simulation with real policy enforcement
+- `apps/examples/mcp-agent` - zero-cost MCP client simulation against local MCP server
 
 ## Quick Start
 
@@ -45,6 +48,7 @@ pnpm dev
 pnpm --filter @limitrum/web dev
 pnpm --filter @limitrum/api dev
 pnpm --filter @limitrum/cli dev -- simulate
+pnpm --filter @limitrum/mcp-server dev
 ```
 
 ## Example: SDK Guard
@@ -64,9 +68,12 @@ const verdict = await guard.verify({
 
 ## Real-World LLM Adapter (Zero-Cost Simulation)
 
-`@limitrum/sdk` includes an OpenAI adapter that wraps `chat.completions.create` and intercepts tool calls before execution.
+`@limitrum/sdk` includes adapters for OpenAI, Anthropic, and LangChain integration points:
 
 - `withLimitrum(openaiClient, guard, { agentId })` inspects tool calls from the LLM response
+- `withLimitrumAnthropic(anthropicClient, guard, { agentId })` inspects Anthropic `tool_use` calls from `messages.create`
+- `withLimitrumTool(tool, guard, { agentId })` wraps a single LangChain-style tool
+- `withLimitrumToolkit(tools, guard, { agentId })` wraps an entire toolkit array automatically
 - each tool call is validated by `guard.verify(...)`
 - if blocked, Limitrum injects a system message back to the model:
   - `Limitrum Policy Enforcement: Action blocked because <reason>`
@@ -80,6 +87,31 @@ pnpm --filter @limitrum/example-yolo-agent dev
 ```
 
 This demo uses the official `openai` SDK but mocks network responses locally, so no API key spend is required.
+
+## MCP Server (Universal Client Support)
+
+`@limitrum/mcp-server` exposes one MCP tool:
+
+- `limitrum_guard` -> deterministic policy evaluation via `LimitrumGuard.verify(...)`
+
+Supported transports:
+
+- **stdio** (default): for local MCP clients (Cursor, Claude Desktop, Gemini CLI, Codex-compatible clients)
+- **SSE**: for HTTP/SSE MCP integrations
+
+Run MCP server:
+
+```bash
+pnpm --filter @limitrum/mcp-server dev
+pnpm --filter @limitrum/mcp-server dev:sse
+```
+
+Zero-cost MCP interaction demo:
+
+```bash
+pnpm --filter @limitrum/db seed
+pnpm --filter @limitrum/example-mcp-agent dev
+```
 
 ## Web CLI vs Real CLI
 

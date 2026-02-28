@@ -7,7 +7,9 @@
   "types": "src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./adapters/openai": "./src/adapters/openai.ts"
+    "./adapters/openai": "./src/adapters/openai.ts",
+    "./adapters/anthropic": "./src/adapters/anthropic.ts",
+    "./adapters/langchain": "./src/adapters/langchain.ts"
   },
   "scripts": {
     "dev": "tsx watch src/index.ts",
