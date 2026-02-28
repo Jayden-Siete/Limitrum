@@ -52,6 +52,7 @@ app.post("/v1/verify-intent", async (c) => {
   });
 });
 
-const port = Number(process.env.PORT ?? 8000);
+const isProduction = process.env.NODE_ENV === "production";
+const port = Number(process.env.PORT ?? (isProduction ? 8080 : 8000));
 serve({ fetch: app.fetch, port });
 console.log(`Limitrum API running on http://localhost:${port}`);

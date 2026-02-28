@@ -49,7 +49,22 @@ function getStartOfUtcDayTimestampMs(nowMs: number) {
   return date.getTime();
 }
 
+const DEFAULT_PRODUCTION_API_URL = "https://api.limitrum.cloud";
+
+type LimitrumGuardOptions = {
+  baseUrl?: string;
+};
+
 export class LimitrumGuard {
+  public readonly baseUrl: string;
+
+  constructor(options: LimitrumGuardOptions = {}) {
+    this.baseUrl =
+      options.baseUrl ??
+      process.env.LIMITRUM_API_URL ??
+      (process.env.NODE_ENV === "production" ? DEFAULT_PRODUCTION_API_URL : "http://localhost:8000");
+  }
+
   async verify(input: VerifyIntentInput): Promise<VerifyIntentResult> {
     const intent = verifyIntentInputSchema.parse(input);
     const now = Date.now();
