@@ -1,0 +1,23 @@
+{
+  "name": "@limitrum/api",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "dev": "tsx watch src/index.ts",
+    "build": "tsc -p tsconfig.json",
+    "start": "node dist/index.js",
+    "lint": "echo \"No lint configured for @limitrum/api\"",
+    "typecheck": "tsc -p tsconfig.json --noEmit"
+  },
+  "dependencies": {
+    "@hono/node-server": "latest",
+    "@limitrum/sdk": "workspace:*",
+    "hono": "latest"
+  },
+  "devDependencies": {
+    "@types/node": "latest",
+    "tsx": "latest",
+    "typescript": "latest"
+  }
+}

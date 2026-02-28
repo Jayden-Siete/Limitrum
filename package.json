@@ -1,0 +1,25 @@
+{
+  "name": "limitrum",
+  "version": "0.1.0",
+  "private": true,
+  "packageManager": "pnpm@10.23.0",
+  "scripts": {
+    "dev": "turbo run dev --parallel --filter=@limitrum/web --filter=@limitrum/api",
+    "build": "turbo run build",
+    "lint": "turbo run lint",
+    "typecheck": "turbo run typecheck",
+    "format": "turbo run format"
+  },
+  "devDependencies": {
+    "turbo": "latest",
+    "typescript": "latest"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "better-sqlite3",
+      "esbuild",
+      "sharp",
+      "unrs-resolver"
+    ]
+  }
+}

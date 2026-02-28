@@ -1,0 +1,67 @@
+# Dependencies and build artifacts
+node_modules/
+.pnpm-store/
+.turbo/
+.next/
+dist/
+build/
+coverage/
+out/
+
+# Environment and secrets
+.env
+.env.*
+!.env.example
+!.env.*.example
+*.pem
+*.key
+*.p12
+*.pfx
+*.crt
+*.cer
+*.jks
+*.keystore
+*.kdbx
+*.ovpn
+*.asc
+*.gpg
+*.secret
+*.secrets
+secrets.*
+credentials.*
+*.token
+*.tokens
+id_rsa
+id_rsa.pub
+id_ed25519
+id_ed25519.pub
+
+# Databases and local state
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+*.db-wal
+*.db-shm
+*.sqlcipher
+*.duckdb
+
+# Logs and debug
+*.log
+npm-debug.log*
+pnpm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# IDE and OS
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+test-results/
+tmp-shots/
+
+# TypeScript
+*.tsbuildinfo
