@@ -2,6 +2,8 @@ export type AgentAction = {
   id: string;
   icon: string;
   action: string;
+  target: string;
+  estimatedCostUsd: number;
   displayAction: string;
   description: string;
   type: "allowed" | "blocked";
@@ -20,6 +22,8 @@ export const agentActions: AgentAction[] = [
     id: "charge-50",
     icon: "💳",
     action: 'stripe.createCharge({ amount: 5000, currency: "usd" })',
+    target: "api.stripe.com/v1/charges",
+    estimatedCostUsd: 50,
     displayAction: "stripe.createCharge({ amount: 5000 })",
     description: "Charge $50 — within daily budget",
     type: "allowed",
@@ -29,6 +33,8 @@ export const agentActions: AgentAction[] = [
     id: "charge-1500",
     icon: "💸",
     action: 'stripe.createCharge({ amount: 150000 })',
+    target: "api.stripe.com/v1/charges",
+    estimatedCostUsd: 1500,
     displayAction: "stripe.createCharge({ amount: 150000 })",
     description: "Charge $1,500 — exceeds budget cap",
     type: "blocked",
@@ -38,6 +44,8 @@ export const agentActions: AgentAction[] = [
     id: "unknown-domain",
     icon: "🌐",
     action: 'fetch("https://api.unknown-exfil.io/data")',
+    target: "api.unknown-exfil.io/data",
+    estimatedCostUsd: 1,
     displayAction: 'fetch("api.unknown-exfil.io/data")',
     description: "Unauthorized external domain",
     type: "blocked",
@@ -47,6 +55,8 @@ export const agentActions: AgentAction[] = [
     id: "openai",
     icon: "🤖",
     action: 'openai.chat.completions.create({ model: "gpt-4o" })',
+    target: "api.openai.com/v1/chat/completions",
+    estimatedCostUsd: 3,
     displayAction: "openai.chat.completions.create()",
     description: "GPT-4o call — openai.com is whitelisted",
     type: "allowed",
@@ -56,6 +66,8 @@ export const agentActions: AgentAction[] = [
     id: "syscall",
     icon: "⚠️",
     action: 'spawn_process("/bin/bash", ["-c", "rm -rf /var/data"])',
+    target: "local.syscall/spawn_process",
+    estimatedCostUsd: 0,
     displayAction: 'spawn_process("/bin/bash", ...)',
     description: "Shell execution — syscall blocked",
     type: "blocked",
@@ -65,6 +77,8 @@ export const agentActions: AgentAction[] = [
     id: "delete",
     icon: "🗄️",
     action: 'db.query("DELETE FROM users WHERE id > 0")',
+    target: "local.db/users",
+    estimatedCostUsd: 0,
     displayAction: 'db.query("DELETE FROM users WHERE ...")',
     description: "Mass delete — destructive action blocked",
     type: "blocked",
@@ -74,6 +88,8 @@ export const agentActions: AgentAction[] = [
     id: "github",
     icon: "📋",
     action: 'github.createIssue({ repo: "org/repo", title: "Bug found" })',
+    target: "api.github.com/repos/org/repo/issues",
+    estimatedCostUsd: 1,
     displayAction: 'github.createIssue({ repo: "org/repo" })',
     description: "GitHub API — whitelisted and compliant",
     type: "allowed",

@@ -14,6 +14,11 @@
     "lint": "echo \"No lint configured for @limitrum/sdk\"",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
+  "dependencies": {
+    "@limitrum/db": "workspace:*",
+    "drizzle-orm": "latest",
+    "zod": "latest"
+  },
   "devDependencies": {
     "@types/node": "latest",
     "tsx": "latest",

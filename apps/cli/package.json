@@ -14,8 +14,10 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
+    "@limitrum/db": "workspace:*",
     "@limitrum/sdk": "workspace:*",
-    "commander": "latest"
+    "commander": "latest",
+    "drizzle-orm": "latest"
   },
   "devDependencies": {
     "@types/node": "latest",

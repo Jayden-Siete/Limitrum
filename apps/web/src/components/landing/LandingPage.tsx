@@ -40,6 +40,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   const [selectedActions, setSelectedActions] = useState<string[]>(["charge-50"]);
   const [runningSimulation, setRunningSimulation] = useState(false);
   const [simulationResults, setSimulationResults] = useState<SimResult[]>([]);
+  const apiBaseUrl = process.env.NEXT_PUBLIC_LIMITRUM_API_URL ?? "http://localhost:8787";
 
   const cliCommands = useMemo(() => Object.keys(cliPresets), []);
   const [selectedCmd, setSelectedCmd] = useState("limitrum simulate");
@@ -77,30 +78,70 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
     window.setTimeout(() => setApplySaved(false), 2500);
   };
 
-  const onRunSimulation = () => {
+  const onRunSimulation = async () => {
     if (runningSimulation || selectedActions.length === 0) {
       return;
     }
     setRunningSimulation(true);
     setSimulationResults([]);
     const chosen = agentActions.filter((action) => selectedActions.includes(action.id));
-    chosen.forEach((action, idx) => {
-      window.setTimeout(() => {
+    for (const [idx, action] of chosen.entries()) {
+      const startedAt = performance.now();
+      try {
+        const response = await fetch(`${apiBaseUrl}/v1/verify-intent`, {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            intent: {
+              agentId: "agent_sales_01",
+              action: action.action,
+              target: action.target,
+              amount: action.estimatedCostUsd,
+              estimatedCostUsd: action.estimatedCostUsd,
+              metadata: {
+                ui: "interactive-sandbox",
+                budget,
+                rate,
+                perActionCap: cost,
+                guards,
+                domains,
+              },
+            },
+          }),
+        });
+
+        const payload = (await response.json()) as {
+          decision?: "allowed" | "blocked";
+          reason?: string;
+        };
+        const elapsed = Math.max(8, Math.round(performance.now() - startedAt));
         setSimulationResults((prev) => [
           ...prev,
           {
             id: `${action.id}-${idx}`,
-            type: action.type,
+            type: payload.decision === "blocked" ? "blocked" : "allowed",
             action: action.action,
-            reason: action.reason,
+            reason: payload.reason ?? "No reason returned by Policy Kernel",
+            latency: elapsed,
+          },
+        ]);
+      } catch {
+        setSimulationResults((prev) => [
+          ...prev,
+          {
+            id: `${action.id}-${idx}`,
+            type: "blocked",
+            action: action.action,
+            reason: "Policy Kernel unavailable. Verify API is running on localhost:8787.",
             latency: Math.floor(Math.random() * 20) + 8,
           },
         ]);
-        if (idx === chosen.length - 1) {
-          setRunningSimulation(false);
-        }
-      }, 250 + idx * 700);
-    });
+      }
+      await new Promise<void>((resolve) => {
+        window.setTimeout(() => resolve(), 420);
+      });
+    }
+    setRunningSimulation(false);
   };
 
   const animateCli = (command: string) => {

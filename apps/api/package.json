@@ -13,7 +13,8 @@
   "dependencies": {
     "@hono/node-server": "latest",
     "@limitrum/sdk": "workspace:*",
-    "hono": "latest"
+    "hono": "latest",
+    "zod": "latest"
   },
   "devDependencies": {
     "@types/node": "latest",
