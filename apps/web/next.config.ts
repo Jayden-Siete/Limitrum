@@ -1,7 +1,9 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NODE_ENV !== "production";
+
 const nextConfig: NextConfig = {
-  distDir: "tmp-next-dev",
+  ...(isDev ? { distDir: "tmp-next-dev" } : {}),
   eslint: {
     ignoreDuringBuilds: true,
   },
