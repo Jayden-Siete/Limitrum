@@ -3,7 +3,7 @@
 <picture>
   <source media="(prefers-color-scheme: dark)" srcset=".github/assets/limitrum-logo-white.png">
   <source media="(prefers-color-scheme: light)" srcset=".github/assets/limitrum-logo-dark.png">
-  <img alt="Limitrum" src=".github/assets/limitrum-logo-dark.png" width="520">
+  <img alt="Limitrum" src=".github/assets/limitrum-logo-dark.png" width="250">
 </picture>
 
 **The safety engine for autonomous systems.**  
