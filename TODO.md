@@ -2,12 +2,12 @@
 
 ## Phase 1 — Stabilisation
 - [x] Analyse complète du projet
-- [ ] Fix .gitignore (auth, auth-wal)
-- [ ] Create .env.example
-- [ ] Fix Anthropic adapter (system message bug)
-- [ ] Fix LimitrumGuard baseUrl (HTTP client mode)
-- [ ] Fix landing page (page.tsx → LandingPage component)
-- [ ] Fix next.config.ts (remove ignoreDuringBuilds)
+- [x] Fix .gitignore (auth, auth-wal)
+- [x] Create .env.example
+- [x] Fix Anthropic adapter (system message bug)
+- [x] Fix LimitrumGuard baseUrl (HTTP client mode)
+- [x] Fix landing page (page.tsx → LandingPage component)
+- [x] Fix next.config.ts (remove ignoreDuringBuilds)
 
 ## Phase 2 — Policy Kernel Complet
 - [ ] Extend DB schema (perActionCap, rateLimit, guards flags, blockedPatterns)

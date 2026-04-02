@@ -66,7 +66,4 @@ Logos/
 !.vscode/extensions.json
 !.vscode/settings.json
 test-results/
-tmp-shots/
-
-# TypeScript
-*.tsbuildinfo
+tmp
