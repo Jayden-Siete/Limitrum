@@ -2,7 +2,9 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { CodeSection } from "./CodeSection";
+import { CtaBlock } from "./CtaBlock";
 import { Features } from "./Features";
+import { Footer } from "./Footer";
 import { Hero } from "./Hero";
 import { InteractiveSandbox } from "./InteractiveSandbox";
 import { Pricing } from "./Pricing";
@@ -258,6 +260,8 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
       <CodeSection termLines={termLines} />
       <Features />
       <Pricing />
+      <CtaBlock />
+      <Footer theme={theme} />
     </main>
   );
 }
