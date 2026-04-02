@@ -1,22 +1,21 @@
 "use client";
 
-import { ReactNode } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
-type DashboardLayoutProps = {
-  children: ReactNode;
-};
-
 const navItems = [
-  { href: "/dashboard", label: "Overview", icon: "📊" },
-  { href: "/dashboard/agents", label: "Agents", icon: "🤖" },
-  { href: "/dashboard/policies", label: "Policies", icon: "🛡️" },
-  { href: "/dashboard/logs", label: "Logs", icon: "📋" },
-  { href: "/dashboard/budget", label: "Budget", icon: "💰" },
+  { href: "/dashboard", label: "Overview", icon: "◉" },
+  { href: "/dashboard/agents", label: "Agents", icon: "◈" },
+  { href: "/dashboard/policies", label: "Policies", icon: "◇" },
+  { href: "/dashboard/logs", label: "Logs", icon: "▤" },
+  { href: "/dashboard/budget", label: "Budget", icon: "◫" },
 ];
 
-export default function DashboardLayout({ children }: DashboardLayoutProps) {
+export default function DashboardLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   const pathname = usePathname();
 
   return (
