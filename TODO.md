@@ -32,12 +32,12 @@
 - [x] GET /v1/agents/:id/status
 
 ## Phase 4 — CLI Réel
-- [ ] limitrum status
-- [ ] limitrum policy show
-- [ ] limitrum policy apply
-- [ ] limitrum logs --tail
-- [ ] limitrum budget report
-- [ ] limitrum agent list
+- [x] limitrum status
+- [x] limitrum policy show
+- [x] limitrum policy apply
+- [x] limitrum logs --tail
+- [x] limitrum budget report
+- [x] limitrum agent list
 
 ## Phase 5 — Web App Réelle
 - [ ] Dashboard layout
