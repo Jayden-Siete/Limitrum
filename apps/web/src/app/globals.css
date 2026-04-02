@@ -107,6 +107,22 @@ a {
   padding: 0 12px;
 }
 
+.btn-nav-secondary {
+  border-radius: 8px;
+  border: 1px solid var(--border);
+  background: transparent;
+  color: var(--text2);
+  height: 36px;
+  padding: 0 12px;
+  font-size: 13px;
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.btn-nav-secondary:hover {
+  border-color: var(--border2);
+  color: var(--text);
+}
+
 .btn-nav-primary {
   background: var(--cyan);
   border-color: transparent;
