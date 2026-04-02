@@ -45,6 +45,10 @@ id_ed25519.pub
 *.db-shm
 *.sqlcipher
 *.duckdb
+# Local SQLite WAL files (no extension)
+auth
+auth-wal
+limitrum.sqlite
 
 # Logs and debug
 *.log
