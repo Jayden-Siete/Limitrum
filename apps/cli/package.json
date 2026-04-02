@@ -16,8 +16,7 @@
   "dependencies": {
     "@limitrum/db": "workspace:*",
     "@limitrum/sdk": "workspace:*",
-    "commander": "latest",
-    "drizzle-orm": "latest"
+    "commander": "latest"
   },
   "devDependencies": {
     "@types/node": "latest",
