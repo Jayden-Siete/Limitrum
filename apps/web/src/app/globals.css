@@ -933,6 +933,27 @@ a {
   gap: 8px;
 }
 
+.pc-featured {
+  border-color: var(--cyan);
+  box-shadow: 0 0 32px rgba(6, 182, 212, 0.18);
+  position: relative;
+}
+
+.pc-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--cyan);
+  color: #07212d;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 3px 12px;
+  border-radius: 999px;
+  white-space: nowrap;
+  letter-spacing: 0.04em;
+}
+
 .pc-tier {
   color: var(--cyan2);
   font-size: 12px;
@@ -943,6 +964,14 @@ a {
 .pc-price {
   font-size: 30px;
   line-height: 1;
+  font-weight: 700;
+}
+
+.pc-period {
+  font-size: 14px;
+  font-weight: 400;
+  color: var(--text3);
+  margin-left: 2px;
 }
 
 .pc-verif {
@@ -951,12 +980,59 @@ a {
   min-height: 32px;
 }
 
+.pc-features {
+  list-style: none;
+  padding: 0;
+  margin: 8px 0 0;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  flex: 1;
+}
+
+.pc-feature-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 8px;
+  font-size: 13px;
+  color: var(--text2);
+}
+
+.pc-check {
+  color: var(--cyan2);
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+
 .pc-btn {
-  margin-top: auto;
+  margin-top: 16px;
   border-radius: 8px;
   border: 1px solid var(--border2);
-  padding: 8px;
+  padding: 10px;
   text-align: center;
+  display: block;
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  transition: border-color 0.15s, color 0.15s;
+}
+
+.pc-btn:hover {
+  border-color: var(--cyan);
+  color: var(--text);
+}
+
+.pc-btn-featured {
+  background: var(--cyan);
+  border-color: transparent;
+  color: #07212d;
+  font-weight: 700;
+}
+
+.pc-btn-featured:hover {
+  background: var(--cyan2);
+  color: #07212d;
 }
 
 @media (max-width: 980px) {
