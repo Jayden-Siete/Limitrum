@@ -9,6 +9,7 @@ import { agentsRouter } from "./routes/agents.js";
 import { policyRouter } from "./routes/policy.js";
 import { logsRouter } from "./routes/logs.js";
 import { budgetRouter } from "./routes/budget.js";
+import { apiKeysRouter } from "./routes/apiKeys.js";
 
 // ── App setup ─────────────────────────────────────────────────────────────────
 
@@ -91,6 +92,7 @@ api.route("/agents", agentsRouter);
 api.route("/agents", policyRouter);   // /v1/agents/:id/policy
 api.route("/logs", logsRouter);
 api.route("/budget", budgetRouter);
+api.route("/api-keys", apiKeysRouter);
 
 app.route("/v1", api);
 
@@ -131,3 +133,6 @@ console.log(`  → GET  /health            (public)`);
 console.log(`  → GET  /v1/agents         (auth required)`);
 console.log(`  → GET  /v1/logs           (auth required)`);
 console.log(`  → GET  /v1/budget/report  (auth required)`);
+console.log(`  → POST /v1/api-keys       (auth required)`);
+console.log(`  → GET  /v1/api-keys       (auth required)`);
+console.log(`  → DEL  /v1/api-keys/:id   (auth required)`);
