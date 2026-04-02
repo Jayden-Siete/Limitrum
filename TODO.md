@@ -10,14 +10,14 @@
 - [x] Fix next.config.ts (remove ignoreDuringBuilds)
 
 ## Phase 2 — Policy Kernel Complet
-- [ ] Extend DB schema (perActionCap, rateLimit, guards flags, blockedPatterns)
-- [ ] Implement per-action cap guard
-- [ ] Implement rate limiting guard
-- [ ] Implement loop detection guard
-- [ ] Implement syscall protection guard
-- [ ] Implement destructive action guard
-- [ ] Implement data exfil detection guard
-- [ ] Implement prompt injection shield
+- [x] Extend DB schema (perActionCap, rateLimit, guards flags, blockedPatterns)
+- [x] Implement per-action cap guard
+- [x] Implement rate limiting guard
+- [x] Implement loop detection guard
+- [x] Implement syscall protection guard
+- [x] Implement destructive action guard
+- [x] Implement data exfil detection guard
+- [x] Implement prompt injection shield
 
 ## Phase 3 — API Réelle
 - [ ] Add api_keys table to DB schema
