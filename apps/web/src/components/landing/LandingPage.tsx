@@ -1,7 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
 import { useCliAutoplay } from "../../hooks/useCliAutoplay";
+import { useCliSandbox } from "../../hooks/useCliSandbox";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { usePolicyConfig } from "../../hooks/usePolicyConfig";
 import { useSimulation } from "../../hooks/useSimulation";
@@ -15,9 +15,9 @@ import { InteractiveSandbox } from "./InteractiveSandbox";
 import { Pricing } from "./Pricing";
 import { TickerAndProps } from "./TickerAndProps";
 import { agentActions, cliPresets, defaultDomains, terminalAutoplayLines } from "./data";
+import { useState } from "react";
 
 type TabKey = "policy" | "agent" | "cli";
-type CliLine = { type: string; text: string };
 
 type LandingPageProps = {
   logoSrc?: string;
@@ -46,40 +46,13 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   });
 
   // ── CLI sandbox ─────────────────────────────────────────────────
-  const cliCommands = useMemo(() => Object.keys(cliPresets), []);
-  const [selectedCmd, setSelectedCmd] = useState("limitrum simulate");
-  const [cliInput, setCliInput] = useState("limitrum simulate");
-  const [cliLines, setCliLines] = useState<CliLine[]>([]);
+  const cli = useCliSandbox(cliPresets, "limitrum simulate");
 
   // ── Terminal autoplay (CodeSection) ────────────────────────────
   const termLines = useCliAutoplay(terminalAutoplayLines);
 
   // ── Handlers ────────────────────────────────────────────────────
   const onCopyInstall = () => copyToClipboard("pnpm add @limitrum/sdk");
-
-  const animateCli = (command: string) => {
-    const rows = cliPresets[command] ?? [
-      ["prompt", `$ ${command}`],
-      ["err", `  command not found: ${command}`],
-      ["dim", "  Run `limitrum --help` for usage."],
-    ];
-    setCliLines([]);
-    rows.forEach(([type, text], idx) => {
-      window.setTimeout(
-        () => setCliLines((prev) => [...prev, { type, text }]),
-        idx === 0 ? 40 : 120 + idx * 85,
-      );
-    });
-  };
-
-  useEffect(() => {
-    animateCli(selectedCmd);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  const runCliCommand = () => {
-    animateCli(cliInput.trim() || "limitrum --help");
-  };
 
   // ── Render ──────────────────────────────────────────────────────
   return (
@@ -97,19 +70,15 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
       <InteractiveSandbox
         activeTab={activeTab}
         cli={{
-          selectedCmd,
-          input: cliInput,
-          lines: cliLines,
-          commands: cliCommands,
+          selectedCmd: cli.selectedCmd,
+          input: cli.input,
+          lines: cli.lines,
+          commands: cli.commands,
         }}
         onCli={{
-          onSelectCommand: (cmd) => {
-            setSelectedCmd(cmd);
-            setCliInput(cmd);
-            animateCli(cmd);
-          },
-          onInput: setCliInput,
-          onRun: runCliCommand,
+          onSelectCommand: cli.selectCommand,
+          onInput: cli.setInput,
+          onRun: cli.runCommand,
         }}
         onPolicy={{
           onBudget: pol.setBudget,
