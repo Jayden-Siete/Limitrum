@@ -40,10 +40,10 @@
 - [x] limitrum agent list
 
 ## Phase 5 — Web App Réelle
-- [ ] Dashboard layout
-- [ ] Dashboard overview page
-- [ ] Agents list page
-- [ ] Agent detail + policy editor
-- [ ] Logs viewer (paginated, filterable)
-- [ ] Budget report page
+- [x] Dashboard layout
+- [x] Dashboard overview page
+- [x] Agents list page
+- [x] Agent detail + policy editor
+- [x] Logs viewer (paginated, filterable)
+- [x] Budget report page
 - [ ] Connect sandbox to real API (Apply Policy)
