@@ -558,13 +558,27 @@ async function ensureYoloAgent(agentId: string, budget: number) {
       id: policyId,
       agentId,
       maxDailySpend: budget,
+      perActionCap: 0,
+      maxRatePerMinute: 0,
       allowedEndpoints: allowlist,
+      loopDetectionEnabled: 1,
+      loopDetectionMaxCount: 5,
+      loopDetectionWindowSec: 10,
+      syscallProtectionEnabled: 1,
+      destructiveActionsEnabled: 1,
+      dataExfilEnabled: 1,
+      promptInjectionEnabled: 0,
+      blockedPatterns: "[]",
       createdAt: now,
       updatedAt: now,
     })
     .onConflictDoUpdate({
       target: policies.id,
-      set: { maxDailySpend: budget, allowedEndpoints: allowlist, updatedAt: now },
+      set: {
+        maxDailySpend: budget,
+        allowedEndpoints: allowlist,
+        updatedAt: now,
+      },
     });
 }
 
