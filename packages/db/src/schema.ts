@@ -22,8 +22,45 @@ export const policies = sqliteTable("policies", {
   agentId: text("agent_id")
     .notNull()
     .references(() => agents.id),
+
+  // ── Financial controls ──────────────────────────────────────────
+  /** Maximum cumulative spend allowed per UTC day (USD) */
   maxDailySpend: real("max_daily_spend").notNull(),
-  allowedEndpoints: text("allowed_endpoints").notNull(), // JSON string array
+  /** Maximum cost allowed for a single action (USD). 0 = unlimited */
+  perActionCap: real("per_action_cap").notNull().default(0),
+
+  // ── Rate limiting ───────────────────────────────────────────────
+  /** Maximum number of allowed actions per minute. 0 = unlimited */
+  maxRatePerMinute: integer("max_rate_per_minute").notNull().default(0),
+
+  // ── Domain allowlist ────────────────────────────────────────────
+  /** JSON string array of allowed hostnames e.g. ["api.stripe.com"] */
+  allowedEndpoints: text("allowed_endpoints").notNull(),
+
+  // ── Behavioral guards (1 = enabled, 0 = disabled) ───────────────
+  /** Detect repeated identical actions within a short window */
+  loopDetectionEnabled: integer("loop_detection_enabled").notNull().default(1),
+  /** Maximum identical actions allowed in the loop window. Default: 5 */
+  loopDetectionMaxCount: integer("loop_detection_max_count").notNull().default(5),
+  /** Loop detection window in seconds. Default: 10 */
+  loopDetectionWindowSec: integer("loop_detection_window_sec").notNull().default(10),
+
+  /** Block syscall / process-spawn targets */
+  syscallProtectionEnabled: integer("syscall_protection_enabled").notNull().default(1),
+
+  /** Block destructive SQL / filesystem actions */
+  destructiveActionsEnabled: integer("destructive_actions_enabled").notNull().default(1),
+
+  /** Block requests to non-allowlisted external domains (data exfiltration) */
+  dataExfilEnabled: integer("data_exfil_enabled").notNull().default(1),
+
+  /** Detect prompt injection patterns in action metadata */
+  promptInjectionEnabled: integer("prompt_injection_enabled").notNull().default(0),
+
+  /** JSON array of additional blocked regex patterns applied to action + target */
+  blockedPatterns: text("blocked_patterns").notNull().default("[]"),
+
+  // ── Timestamps ──────────────────────────────────────────────────
   createdAt: integer("created_at").notNull(),
   updatedAt: integer("updated_at").notNull(),
 });
@@ -38,7 +75,23 @@ export const intentLogs = sqliteTable("intent_logs", {
   target: text("target").notNull(),
   decision: text("decision").notNull(), // allowed | blocked
   reason: text("reason").notNull(),
+  /** Guard that triggered the block (e.g. "budget", "domain", "loop", "syscall") */
+  guardTriggered: text("guard_triggered"),
   amount: real("amount").notNull().default(0),
   estimatedCostUsd: real("estimated_cost_usd").notNull().default(0),
+  createdAt: integer("created_at").notNull(),
+});
+
+export const apiKeys = sqliteTable("api_keys", {
+  id: text("id").primaryKey(),
+  organizationId: text("organization_id")
+    .notNull()
+    .references(() => organizations.id),
+  /** Hashed key stored in DB — never store plaintext */
+  keyHash: text("key_hash").notNull().unique(),
+  /** Human-readable label */
+  label: text("label").notNull(),
+  /** ISO date string for expiry. Null = never expires */
+  expiresAt: integer("expires_at"),
   createdAt: integer("created_at").notNull(),
 });
