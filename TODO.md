@@ -20,16 +20,16 @@
 - [x] Implement prompt injection shield
 
 ## Phase 3 — API Réelle
-- [ ] Add api_keys table to DB schema
-- [ ] Add API key auth middleware
-- [ ] GET /v1/agents
-- [ ] POST /v1/agents
-- [ ] GET /v1/agents/:id
-- [ ] GET /v1/agents/:id/policy
-- [ ] PUT /v1/agents/:id/policy
-- [ ] GET /v1/logs (paginated)
-- [ ] GET /v1/budget/report
-- [ ] GET /v1/agents/:id/status
+- [x] Add api_keys table to DB schema
+- [x] Add API key auth middleware
+- [x] GET /v1/agents
+- [x] POST /v1/agents
+- [x] GET /v1/agents/:id
+- [x] GET /v1/agents/:id/policy
+- [x] PUT /v1/agents/:id/policy
+- [x] GET /v1/logs (paginated)
+- [x] GET /v1/budget/report
+- [x] GET /v1/agents/:id/status
 
 ## Phase 4 — CLI Réel
 - [ ] limitrum status
