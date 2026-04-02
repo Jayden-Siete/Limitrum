@@ -6,7 +6,9 @@
   "scripts": {
     "test": "vitest run",
     "test:watch": "vitest",
-    "test:coverage": "vitest run --coverage"
+    "test:coverage": "vitest run --coverage",
+    "test:unit": "vitest run --config vitest.config.ts --reporter=verbose unit",
+    "test:integration": "vitest run --config vitest.integration.config.ts --reporter=verbose integration"
   },
   "dependencies": {
     "@limitrum/sdk": "workspace:*",
