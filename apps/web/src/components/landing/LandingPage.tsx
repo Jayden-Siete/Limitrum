@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useCliAutoplay } from "../../hooks/useCliAutoplay";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
+import { usePolicyConfig } from "../../hooks/usePolicyConfig";
 import { useSimulation } from "../../hooks/useSimulation";
 import { useTheme } from "../../hooks/useTheme";
 import { CodeSection } from "./CodeSection";
@@ -17,68 +18,44 @@ import { agentActions, cliPresets, defaultDomains, terminalAutoplayLines } from 
 
 type TabKey = "policy" | "agent" | "cli";
 type CliLine = { type: string; text: string };
+
 type LandingPageProps = {
   logoSrc?: string;
   shellSrc?: string;
 };
 
 export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
+  // ── Global state ────────────────────────────────────────────────
   const [theme, toggleTheme] = useTheme("dark");
   const [copied, copyToClipboard] = useCopyToClipboard(2000);
   const [activeTab, setActiveTab] = useState<TabKey>("policy");
 
-  const [budget, setBudget] = useState(50);
-  const [rate, setRate] = useState(100);
-  const [cost, setCost] = useState(5);
-  const [guards, setGuards] = useState({
-    loopDetection: true,
-    syscallProtection: true,
-    dataExfil: true,
-    destructiveActions: true,
-    promptInjection: false,
-  });
-  const [domains, setDomains] = useState(defaultDomains);
-  const [domainInput, setDomainInput] = useState("");
-  const [applySaved, setApplySaved] = useState(false);
+  // ── Policy config (budget, rate, guards, domains) ───────────────
+  const pol = usePolicyConfig(defaultDomains);
 
+  // ── Agent simulation ────────────────────────────────────────────
   const apiBaseUrl = process.env.NEXT_PUBLIC_LIMITRUM_API_URL ?? "http://localhost:8000";
   const sim = useSimulation({
     apiBaseUrl,
     agentId: "agent_sales_01",
-    budget,
-    rate,
-    perActionCap: cost,
-    guards,
-    domains,
+    budget: pol.budget,
+    rate: pol.rate,
+    perActionCap: pol.cost,
+    guards: pol.guards,
+    domains: pol.domains,
   });
 
+  // ── CLI sandbox ─────────────────────────────────────────────────
   const cliCommands = useMemo(() => Object.keys(cliPresets), []);
   const [selectedCmd, setSelectedCmd] = useState("limitrum simulate");
   const [cliInput, setCliInput] = useState("limitrum simulate");
   const [cliLines, setCliLines] = useState<CliLine[]>([]);
 
+  // ── Terminal autoplay (CodeSection) ────────────────────────────
   const termLines = useCliAutoplay(terminalAutoplayLines);
 
+  // ── Handlers ────────────────────────────────────────────────────
   const onCopyInstall = () => copyToClipboard("pnpm add @limitrum/sdk");
-
-  const onToggleGuard = (key: string) => {
-    setGuards((prev) => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
-  };
-
-  const onDomainEnter = () => {
-    const next = domainInput.trim().toLowerCase();
-    if (!next || domains.includes(next)) {
-      return;
-    }
-    setDomains((prev) => [...prev, next]);
-    setDomainInput("");
-  };
-
-  const onApplyPolicy = () => {
-    setApplySaved(true);
-    window.setTimeout(() => setApplySaved(false), 2500);
-  };
-
 
   const animateCli = (command: string) => {
     const rows = cliPresets[command] ?? [
@@ -104,6 +81,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
     animateCli(cliInput.trim() || "limitrum --help");
   };
 
+  // ── Render ──────────────────────────────────────────────────────
   return (
     <main>
       <Hero
@@ -134,14 +112,14 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
           onRun: runCliCommand,
         }}
         onPolicy={{
-          onBudget: setBudget,
-          onRate: setRate,
-          onCost: setCost,
-          onToggleGuard,
-          onDomainInput: setDomainInput,
-          onDomainEnter,
-          onRemoveDomain: (domain) => setDomains((prev) => prev.filter((d) => d !== domain)),
-          onApplyPolicy,
+          onBudget: pol.setBudget,
+          onRate: pol.setRate,
+          onCost: pol.setCost,
+          onToggleGuard: (key) => pol.toggleGuard(key as keyof typeof pol.guards),
+          onDomainInput: pol.setDomainInput,
+          onDomainEnter: pol.addDomain,
+          onRemoveDomain: pol.removeDomain,
+          onApplyPolicy: pol.applyPolicy,
         }}
         onSimulation={{
           onToggleAction: sim.toggleAction,
@@ -149,13 +127,13 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
         }}
         onTab={setActiveTab}
         policy={{
-          budget,
-          rate,
-          cost,
-          guards,
-          domains,
-          domainInput,
-          applySaved,
+          budget: pol.budget,
+          rate: pol.rate,
+          cost: pol.cost,
+          guards: pol.guards,
+          domains: pol.domains,
+          domainInput: pol.domainInput,
+          applySaved: pol.applySaved,
         }}
         simulation={{
           actions: agentActions,
