@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useCliAutoplay } from "../../hooks/useCliAutoplay";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
+import { useSimulation } from "../../hooks/useSimulation";
 import { useTheme } from "../../hooks/useTheme";
 import { CodeSection } from "./CodeSection";
 import { CtaBlock } from "./CtaBlock";
@@ -16,8 +17,6 @@ import { agentActions, cliPresets, defaultDomains, terminalAutoplayLines } from 
 
 type TabKey = "policy" | "agent" | "cli";
 type CliLine = { type: string; text: string };
-type SimResult = { id: string; type: "allowed" | "blocked"; action: string; reason: string; latency: number };
-
 type LandingPageProps = {
   logoSrc?: string;
   shellSrc?: string;
@@ -42,10 +41,16 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   const [domainInput, setDomainInput] = useState("");
   const [applySaved, setApplySaved] = useState(false);
 
-  const [selectedActions, setSelectedActions] = useState<string[]>(["charge-50"]);
-  const [runningSimulation, setRunningSimulation] = useState(false);
-  const [simulationResults, setSimulationResults] = useState<SimResult[]>([]);
   const apiBaseUrl = process.env.NEXT_PUBLIC_LIMITRUM_API_URL ?? "http://localhost:8000";
+  const sim = useSimulation({
+    apiBaseUrl,
+    agentId: "agent_sales_01",
+    budget,
+    rate,
+    perActionCap: cost,
+    guards,
+    domains,
+  });
 
   const cliCommands = useMemo(() => Object.keys(cliPresets), []);
   const [selectedCmd, setSelectedCmd] = useState("limitrum simulate");
@@ -74,72 +79,6 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
     window.setTimeout(() => setApplySaved(false), 2500);
   };
 
-  const onRunSimulation = async () => {
-    if (runningSimulation || selectedActions.length === 0) {
-      return;
-    }
-    setRunningSimulation(true);
-    setSimulationResults([]);
-    const chosen = agentActions.filter((action) => selectedActions.includes(action.id));
-    for (const [idx, action] of chosen.entries()) {
-      const startedAt = performance.now();
-      try {
-        const response = await fetch(`${apiBaseUrl}/v1/verify-intent`, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            intent: {
-              agentId: "agent_sales_01",
-              action: action.action,
-              target: action.target,
-              amount: action.estimatedCostUsd,
-              estimatedCostUsd: action.estimatedCostUsd,
-              metadata: {
-                ui: "interactive-sandbox",
-                budget,
-                rate,
-                perActionCap: cost,
-                guards,
-                domains,
-              },
-            },
-          }),
-        });
-
-        const payload = (await response.json()) as {
-          decision?: "allowed" | "blocked";
-          reason?: string;
-        };
-        if (!response.ok) {
-          throw new Error(payload.reason ?? "Policy Kernel returned an error response.");
-        }
-        const elapsed = Math.max(8, Math.round(performance.now() - startedAt));
-        setSimulationResults((prev) => [
-          ...prev,
-          {
-            id: `${action.id}-${idx}`,
-            type: payload.decision === "blocked" ? "blocked" : "allowed",
-            action: action.action,
-            reason: payload.reason ?? "No reason returned by Policy Kernel",
-            latency: elapsed,
-          },
-        ]);
-      } catch {
-        const elapsed = Math.max(8, Math.round(performance.now() - startedAt));
-        setSimulationResults((prev) => [
-          ...prev,
-          {
-            id: `${action.id}-${idx}`,
-            type: "blocked",
-            action: action.action,
-            reason: "Policy Kernel unavailable. Verify API is running on localhost:8000.",
-            latency: elapsed,
-          },
-        ]);
-      }
-    }
-    setRunningSimulation(false);
-  };
 
   const animateCli = (command: string) => {
     const rows = cliPresets[command] ?? [
@@ -205,9 +144,8 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
           onApplyPolicy,
         }}
         onSimulation={{
-          onToggleAction: (id) =>
-            setSelectedActions((prev) => (prev.includes(id) ? prev.filter((v) => v !== id) : [...prev, id])),
-          onRun: onRunSimulation,
+          onToggleAction: sim.toggleAction,
+          onRun: () => sim.run(agentActions),
         }}
         onTab={setActiveTab}
         policy={{
@@ -221,9 +159,9 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
         }}
         simulation={{
           actions: agentActions,
-          selected: selectedActions,
-          running: runningSimulation,
-          results: simulationResults,
+          selected: sim.selectedActions,
+          running: sim.running,
+          results: sim.results,
         }}
       />
 
