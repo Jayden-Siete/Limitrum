@@ -1,0 +1,75 @@
+name: Release
+
+on:
+  push:
+    tags:
+      - "v*.*.*"
+
+permissions:
+  contents: write
+
+jobs:
+  # ── Create GitHub Release ──────────────────────────────────────────────────
+  release:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build all packages
+        run: pnpm build
+
+      - name: Extract version from tag
+        id: version
+        run: echo "VERSION=${GITHUB_REF#refs/tags/v}" >> $GITHUB_OUTPUT
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Limitrum v${{ steps.version.outputs.VERSION }}"
+          body: |
+            ## Limitrum v${{ steps.version.outputs.VERSION }}
+
+            The safety engine for autonomous systems.
+
+            ### Installation
+            ```bash
+            pnpm add @limitrum/sdk
+            ```
+
+            ### What's Changed
+            See [CHANGELOG](https://github.com/Jayden-Siete/Limitrum/blob/main/CHANGELOG.md) for full details.
+
+            ### Quick Start
+            ```typescript
+            import { LimitrumGuard } from "@limitrum/sdk";
+
+            const guard = new LimitrumGuard();
+            const result = await guard.verify({
+              agentId: "my-agent",
+              action: "http:POST",
+              target: "api.stripe.com",
+              amount: 9.99,
+            });
+
+            if (!result.allowed) {
+              throw new Error(result.reason);
+            }
+            ```
+          draft: false
+          prerelease: ${{ contains(steps.version.outputs.VERSION, '-') }}
+          generate_release_notes: true
