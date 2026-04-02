@@ -1,6 +1,8 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
+import { useTheme } from "../../hooks/useTheme";
 import { CodeSection } from "./CodeSection";
 import { CtaBlock } from "./CtaBlock";
 import { Features } from "./Features";
@@ -21,8 +23,8 @@ type LandingPageProps = {
 };
 
 export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
-  const [theme, setTheme] = useState<"dark" | "light">("dark");
-  const [copied, setCopied] = useState(false);
+  const [theme, toggleTheme] = useTheme("dark");
+  const [copied, copyToClipboard] = useCopyToClipboard(2000);
   const [activeTab, setActiveTab] = useState<TabKey>("policy");
 
   const [budget, setBudget] = useState(50);
@@ -52,15 +54,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   const [termLines, setTermLines] = useState<CliLine[]>([]);
   const termTimerRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", theme);
-  }, [theme]);
-
-  const onCopyInstall = async () => {
-    await navigator.clipboard.writeText("pnpm add @limitrum/sdk");
-    setCopied(true);
-    window.setTimeout(() => setCopied(false), 2000);
-  };
+  const onCopyInstall = () => copyToClipboard("pnpm add @limitrum/sdk");
 
   const onToggleGuard = (key: string) => {
     setGuards((prev) => ({ ...prev, [key]: !prev[key as keyof typeof prev] }));
@@ -201,7 +195,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
         copied={copied}
         logoSrc={logoSrc}
         onCopyInstall={onCopyInstall}
-        onToggleTheme={() => setTheme((prev) => (prev === "dark" ? "light" : "dark"))}
+        onToggleTheme={toggleTheme}
         shellSrc={shellSrc}
         theme={theme}
       />
