@@ -1,0 +1,20 @@
+{
+  "name": "@limitrum/tests",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "scripts": {
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "test:coverage": "vitest run --coverage"
+  },
+  "dependencies": {
+    "@limitrum/sdk": "workspace:*",
+    "@limitrum/db": "workspace:*"
+  },
+  "devDependencies": {
+    "@vitest/coverage-v8": "^2.0.0",
+    "vitest": "^2.0.0",
+    "typescript": "latest"
+  }
+}
