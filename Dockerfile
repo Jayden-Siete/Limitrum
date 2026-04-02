@@ -8,22 +8,20 @@ WORKDIR /app
 
 FROM base AS deps
 
-COPY package.json pnpm-lock.yaml pnpm-workspace.yaml turbo.json tsconfig.base.json ./
-COPY apps/api/package.json apps/api/package.json
-COPY packages/sdk/package.json packages/sdk/package.json
-COPY packages/db/package.json packages/db/package.json
+# Copy full workspace so pnpm symlink layout stays valid.
+COPY . .
 
 RUN pnpm install --frozen-lockfile
+RUN pnpm --filter @limitrum/db build && pnpm --filter @limitrum/sdk build && pnpm --filter @limitrum/api build
 
 FROM base AS runner
 
 ENV NODE_ENV=production
 ENV PORT=8080
 
-COPY --from=deps /app/node_modules ./node_modules
-COPY . .
+COPY --from=deps /app /app
 
 EXPOSE 8080
 
-# Run API directly from TypeScript using tsx runtime (workspace-aware).
-CMD ["node", "--import", "tsx", "apps/api/src/index.ts"]
+# Run compiled API (no tsx/dev-runtime dependency on Cloud Run).
+CMD ["node", "/app/apps/api/dist/index.js"]

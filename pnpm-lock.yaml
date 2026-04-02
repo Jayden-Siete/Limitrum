@@ -4,6 +4,9 @@ settings:
   autoInstallPeers: true
   excludeLinksFromLockfile: false
 
+overrides:
+  drizzle-orm: 0.45.1
+
 importers:
 
   .:
@@ -20,6 +23,9 @@ importers:
       '@hono/node-server':
         specifier: latest
         version: 1.19.9(hono@4.12.3)
+      '@limitrum/db':
+        specifier: workspace:*
+        version: link:../../packages/db
       '@limitrum/sdk':
         specifier: workspace:*
         version: link:../../packages/sdk
@@ -52,7 +58,7 @@ importers:
         specifier: latest
         version: 14.0.3
       drizzle-orm:
-        specifier: latest
+        specifier: 0.45.1
         version: 0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)
     devDependencies:
       '@types/node':
@@ -195,7 +201,7 @@ importers:
         specifier: latest
         version: 0.17.0
       drizzle-orm:
-        specifier: latest
+        specifier: 0.45.1
         version: 0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)
     devDependencies:
       '@types/node':
@@ -214,7 +220,7 @@ importers:
         specifier: workspace:*
         version: link:../db
       drizzle-orm:
-        specifier: latest
+        specifier: 0.45.1
         version: 0.45.1(@libsql/client@0.17.0)(@types/better-sqlite3@7.6.13)(better-sqlite3@12.6.2)
       zod:
         specifier: latest
@@ -3354,7 +3360,7 @@ snapshots:
 
   '@types/better-sqlite3@7.6.13':
     dependencies:
-      '@types/node': 25.3.3
+      '@types/node': 20.19.35
     optional: true
 
   '@types/estree@1.0.8': {}

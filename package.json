@@ -20,6 +20,9 @@
       "esbuild",
       "sharp",
       "unrs-resolver"
-    ]
+    ],
+    "overrides": {
+      "drizzle-orm": "0.45.1"
+    }
   }
 }
