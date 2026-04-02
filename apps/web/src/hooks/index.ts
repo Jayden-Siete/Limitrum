@@ -3,6 +3,7 @@
  * Import from "../../hooks" instead of individual files.
  */
 export { useCliAutoplay } from "./useCliAutoplay";
+export { useCliSandbox } from "./useCliSandbox";
 export { useCopyToClipboard } from "./useCopyToClipboard";
 export { usePolicyConfig } from "./usePolicyConfig";
 export type { GuardConfig, PolicyConfig } from "./usePolicyConfig";
