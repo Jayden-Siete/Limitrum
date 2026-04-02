@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
+import { useCliAutoplay } from "../../hooks/useCliAutoplay";
 import { useCopyToClipboard } from "../../hooks/useCopyToClipboard";
 import { useTheme } from "../../hooks/useTheme";
 import { CodeSection } from "./CodeSection";
@@ -51,8 +52,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   const [cliInput, setCliInput] = useState("limitrum simulate");
   const [cliLines, setCliLines] = useState<CliLine[]>([]);
 
-  const [termLines, setTermLines] = useState<CliLine[]>([]);
-  const termTimerRef = useRef<number | null>(null);
+  const termLines = useCliAutoplay(terminalAutoplayLines);
 
   const onCopyInstall = () => copyToClipboard("pnpm add @limitrum/sdk");
 
@@ -164,30 +164,6 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   const runCliCommand = () => {
     animateCli(cliInput.trim() || "limitrum --help");
   };
-
-  useEffect(() => {
-    let idx = 0;
-    const play = () => {
-      setTermLines([]);
-      const append = () => {
-        if (idx >= terminalAutoplayLines.length) {
-          idx = 0;
-          termTimerRef.current = window.setTimeout(play, 2400);
-          return;
-        }
-        const [type, text] = terminalAutoplayLines[idx++];
-        setTermLines((prev) => [...prev, { type, text }]);
-        termTimerRef.current = window.setTimeout(append, type === "prompt" ? 900 : 350);
-      };
-      append();
-    };
-    play();
-    return () => {
-      if (termTimerRef.current) {
-        window.clearTimeout(termTimerRef.current);
-      }
-    };
-  }, []);
 
   return (
     <main>
