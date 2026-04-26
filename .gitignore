@@ -67,3 +67,5 @@ Logos/
 !.vscode/settings.json
 test-results/
 tmp
+.firebase/
+.claude/

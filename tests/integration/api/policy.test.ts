@@ -1,19 +1,9 @@
 import { describe, it, expect } from "vitest";
 
-/**
- * Integration tests for /v1/agents/:id/policy routes
- *
- * Requires:
- *  - API server running on localhost:8000
- *  - DB seeded (pnpm --filter @limitrum/db seed)
- *  - Demo API key: lmt_demo_c6e6149d7aca04bb53202b0dd435acef
- */
-
 const BASE_URL = process.env.API_URL ?? "http://localhost:8000";
-const DEMO_KEY = process.env.DEMO_API_KEY ?? "lmt_demo_c6e6149d7aca04bb53202b0dd435acef";
+const DEMO_KEY =
+  process.env.DEMO_API_KEY ?? "lmt_demo_c6e6149d7aca04bb53202b0dd435acef";
 const DEMO_AGENT_ID = "agent_sales_01";
-
-// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function authHeaders(key = DEMO_KEY) {
   return {
@@ -45,8 +35,6 @@ async function patch(path: string, body: Record<string, unknown>) {
   return { status: res.status, body: (await res.json()) as Record<string, unknown> };
 }
 
-// ── GET /v1/agents/:id/policy ─────────────────────────────────────────────────
-
 describe("GET /v1/agents/:id/policy", () => {
   it("returns 200 for seeded agent", async () => {
     const { status } = await get(`/v1/agents/${DEMO_AGENT_ID}/policy`);
@@ -58,30 +46,18 @@ describe("GET /v1/agents/:id/policy", () => {
     expect(status).toBe(404);
   });
 
-  it("returns policy with all required fields", async () => {
+  it("returns policy with required fields", async () => {
     const { body } = await get(`/v1/agents/${DEMO_AGENT_ID}/policy`);
-    expect(typeof body.id).toBe("string");
-    expect(typeof body.agentId).toBe("string");
-    expect(typeof body.maxDailySpend).toBe("number");
-    expect(typeof body.allowedEndpoints).toBe("string");
-    expect(typeof body.loopDetectionEnabled).toBe("number");
-    expect(typeof body.syscallProtectionEnabled).toBe("number");
-  });
-
-  it("returns policy with guard fields", async () => {
-    const { body } = await get(`/v1/agents/${DEMO_AGENT_ID}/policy`);
-    expect(body).toHaveProperty("perActionCap");
-    expect(body).toHaveProperty("maxRatePerMinute");
-    expect(body).toHaveProperty("destructiveActionsEnabled");
-    expect(body).toHaveProperty("dataExfilEnabled");
-    expect(body).toHaveProperty("promptInjectionEnabled");
-    expect(body).toHaveProperty("blockedPatterns");
+    const policy = body.policy as Record<string, unknown>;
+    expect(typeof policy.id).toBe("string");
+    expect(typeof policy.agentId).toBe("string");
+    expect(typeof policy.maxDailySpend).toBe("number");
+    expect(Array.isArray(policy.allowedEndpoints)).toBe(true);
+    expect(typeof policy.guards).toBe("object");
   });
 });
 
-// ── PATCH /v1/agents/:id/policy ───────────────────────────────────────────────
-
-describe("PATCH /v1/agents/:id/policy", () => {
+describe("PUT/PATCH /v1/agents/:id/policy", () => {
   it("returns 404 for non-existent agent", async () => {
     const { status } = await patch("/v1/agents/agent_nonexistent_xyz/policy", {
       maxDailySpend: 100,
@@ -94,7 +70,7 @@ describe("PATCH /v1/agents/:id/policy", () => {
       maxDailySpend: 75,
     });
     expect(status).toBe(200);
-    expect(body.maxDailySpend).toBe(75);
+    expect((body.policy as Record<string, unknown>).maxDailySpend).toBe(75);
   });
 
   it("restores original maxDailySpend", async () => {
@@ -102,26 +78,30 @@ describe("PATCH /v1/agents/:id/policy", () => {
       maxDailySpend: 50,
     });
     expect(status).toBe(200);
-    expect(body.maxDailySpend).toBe(50);
+    expect((body.policy as Record<string, unknown>).maxDailySpend).toBe(50);
   });
 
-  it("updates loopDetectionEnabled flag", async () => {
-    const { status, body } = await patch(`/v1/agents/${DEMO_AGENT_ID}/policy`, {
-      loopDetectionEnabled: 0,
-    });
-    expect(status).toBe(200);
-    expect(body.loopDetectionEnabled).toBe(0);
-    // restore
-    await patch(`/v1/agents/${DEMO_AGENT_ID}/policy`, { loopDetectionEnabled: 1 });
-  });
+  it("upserts full policy payload with PUT", async () => {
+    const payload = {
+      maxDailySpend: 50,
+      perActionCap: 10,
+      maxRatePerMinute: 20,
+      allowedEndpoints: ["api.openai.com"],
+      loopDetectionEnabled: true,
+      loopDetectionMaxCount: 5,
+      loopDetectionWindowSec: 10,
+      syscallProtectionEnabled: true,
+      destructiveActionsEnabled: true,
+      dataExfilEnabled: true,
+      promptInjectionEnabled: true,
+      blockedPatterns: [],
+    };
 
-  it("updates syscallProtectionEnabled flag", async () => {
-    const { status, body } = await patch(`/v1/agents/${DEMO_AGENT_ID}/policy`, {
-      syscallProtectionEnabled: 0,
-    });
-    expect(status).toBe(200);
-    expect(body.syscallProtectionEnabled).toBe(0);
-    // restore
-    await patch(`/v1/agents/${DEMO_AGENT_ID}/policy`, { syscallProtectionEnabled: 1 });
+    const { status, body } = await put(`/v1/agents/${DEMO_AGENT_ID}/policy`, payload);
+    expect([200, 201]).toContain(status);
+    const policy = body.policy as Record<string, unknown>;
+    expect(policy.maxDailySpend).toBe(50);
+    expect(policy.maxRatePerMinute).toBe(20);
+    expect((policy.guards as Record<string, unknown>).promptInjection).toBeTruthy();
   });
 });

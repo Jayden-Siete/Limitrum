@@ -1,59 +1,71 @@
+import { Activity, DatabaseZap, Fingerprint, Gauge, KeyRound, LockKeyhole, type LucideIcon } from "lucide-react";
+
 type Feature = {
-  icon: string;
+  icon: LucideIcon;
   title: string;
   description: string;
 };
 
 const features: Feature[] = [
   {
-    icon: "🌐",
-    title: "Domain Allowlisting",
-    description: "Every outbound request is checked against an explicit allowlist. Unknown domains are blocked before any data leaves your system.",
+    icon: LockKeyhole,
+    title: "Out-of-band kernel",
+    description: "The enforcement layer is separate from the agent and cannot be overridden by prompt injection.",
   },
   {
-    icon: "💰",
-    title: "Budget Caps",
-    description: "Set daily and per-action spend limits. The kernel enforces them deterministically — no LLM can override a hard budget cap.",
+    icon: Gauge,
+    title: "Budget and rate limits",
+    description: "Hard caps stop runaway spend, API abuse, and repeated tool calls before execution.",
   },
   {
-    icon: "🔁",
-    title: "Loop Detection",
-    description: "Detects repeated identical actions within a configurable time window. Stops runaway agent loops before they cause damage.",
+    icon: Fingerprint,
+    title: "Intent verification",
+    description: "Every tool call is normalized into a signed intent, checked, and returned with a reasoned verdict.",
   },
   {
-    icon: "🛡",
-    title: "Syscall Protection",
-    description: "Blocks process-spawn, shell-exec, and filesystem targets. Autonomous agents cannot escape their sandbox.",
+    icon: DatabaseZap,
+    title: "Data exfil controls",
+    description: "Domain allowlists and destructive action guards reduce the blast radius of connected agents.",
   },
   {
-    icon: "📋",
-    title: "Full Audit Trail",
-    description: "Every intent — allowed or blocked — is logged to a tamper-evident SQLite audit log with guard, reason, and latency.",
+    icon: Activity,
+    title: "Audit-ready logs",
+    description: "Security teams get action, target, verdict, policy hash, agent identity, and latency in one trail.",
   },
   {
-    icon: "⚡",
-    title: "Out-of-Band Kernel",
-    description: "The Policy Kernel runs out-of-process. No prompt injection can reach it. Enforcement is structurally separate from the LLM.",
+    icon: KeyRound,
+    title: "Key lifecycle",
+    description: "Production API keys can be rotated, revoked, observed, and tied to the agents using them.",
   },
 ];
 
 export function Features() {
   return (
-    <section className="section divider" id="features">
+    <section className="section capability-section" id="features">
       <div className="section-inner">
-        <p className="eyebrow-label">Capabilities</p>
-        <h2 className="section-h2">Every guard your CISO has been asking for.</h2>
-        <p className="section-p" style={{ maxWidth: 560 }}>
-          10 deterministic behavioral guards. Zero LLM involvement. Auditable by design.
-        </p>
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow-label">Security surface</p>
+            <h2 className="section-h2">A kernel-shaped answer to agent risk.</h2>
+          </div>
+          <p className="section-p">
+            Limitrum is not another monitoring panel. It is a policy decision point that sits before money moves,
+            files change, processes spawn, or data leaves.
+          </p>
+        </div>
         <div className="features-grid">
-          {features.map((feature) => (
-            <article className="feat" key={feature.title}>
-              <div className="feat-icon">{feature.icon}</div>
-              <div className="feat-h">{feature.title}</div>
-              <div className="feat-p">{feature.description}</div>
-            </article>
-          ))}
+          {features.map((feature) => {
+            const Icon = feature.icon;
+            return (
+              <article className="feat" key={feature.title}>
+                <div className="feat-icon">
+                  <Icon aria-hidden="true" size={20} strokeWidth={1.8} />
+                </div>
+                <div className="feat-h">{feature.title}</div>
+                <div className="feat-p">{feature.description}</div>
+              </article>
+            );
+          })}
         </div>
       </div>
     </section>

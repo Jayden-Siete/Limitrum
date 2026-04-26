@@ -24,7 +24,7 @@ export async function requireApiKey(c: Context, next: Next) {
   }
 
   // Master key bypass (for admin / seeding operations)
-  const masterKey = process.env.LIMITRUM_MASTER_API_KEY;
+  const masterKey = process.env.LIMITRUM_MASTER_API_KEY ?? process.env.LIMITRUM_MASTER_KEY;
   if (masterKey && raw === masterKey) {
     c.set("organizationId", "org_master");
     await next();
@@ -48,6 +48,12 @@ export async function requireApiKey(c: Context, next: Next) {
   if (found.expiresAt !== null && found.expiresAt < now) {
     return c.json({ error: "API key has expired." }, 401);
   }
+
+  if (found.revokedAt !== null) {
+    return c.json({ error: "API key has been revoked." }, 401);
+  }
+
+  await db.update(apiKeys).set({ lastUsedAt: now }).where(eq(apiKeys.id, found.id));
 
   c.set("organizationId", found.organizationId);
   await next();

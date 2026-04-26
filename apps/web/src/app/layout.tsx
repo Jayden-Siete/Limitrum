@@ -18,8 +18,9 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Limitrum — Deploy autonomous agents with absolute confidence.",
-  description: "Limitrum: The safety engine for autonomous systems.",
+  title: "Limitrum - Policy Kernel for autonomous AI agents",
+  description:
+    "Limitrum verifies every AI agent intent before execution with deterministic budgets, domains, syscalls, and audit policies.",
 };
 
 export default function RootLayout({
@@ -29,9 +30,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${inter.variable} ${jetbrainsMono.variable} antialiased`}>
         {children}
       </body>
     </html>

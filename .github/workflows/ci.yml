@@ -11,16 +11,21 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # ── Typecheck ──────────────────────────────────────────────────────────────
-  typecheck:
-    name: Typecheck
+  quality:
+    name: Quality Gates
     runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      DATABASE_URL: ./limitrum-ci.sqlite
+      LIMITRUM_MASTER_API_KEY: ci_master_key_000000000000000000000000
+      LIMITRUM_VERIFY_INTENT_PUBLIC: "true"
+      CORS_ORIGIN: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
 
       - uses: pnpm/action-setup@v4
         with:
-          version: 10
+          version: 10.23.0
 
       - uses: actions/setup-node@v4
         with:
@@ -30,82 +35,51 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Build packages
-        run: pnpm --filter @limitrum/db build; pnpm --filter @limitrum/sdk build
+      - name: Run database migrations
+        run: pnpm db:migrate
 
-      - name: Typecheck all packages
+      - name: Seed deterministic test data
+        run: pnpm db:seed
+
+      - name: Build shared packages
+        run: |
+          pnpm --filter @limitrum/db build
+          pnpm --filter @limitrum/sdk build
+
+      - name: Typecheck
         run: pnpm typecheck
-
-  # ── Lint ───────────────────────────────────────────────────────────────────
-  lint:
-    name: Lint
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
 
       - name: Lint
         run: pnpm lint
 
-  # ── Unit Tests ─────────────────────────────────────────────────────────────
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    needs: [typecheck]
-    steps:
-      - uses: actions/checkout@v4
+      - name: Unit tests
+        run: pnpm test:unit
 
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build packages
-        run: pnpm --filter @limitrum/db build; pnpm --filter @limitrum/sdk build
-
-      - name: Seed database
-        run: pnpm --filter @limitrum/db seed
-
-      - name: Run unit tests
-        run: pnpm --filter @limitrum/tests test:unit
-
-  # ── Build ──────────────────────────────────────────────────────────────────
-  build:
-    name: Build All
-    runs-on: ubuntu-latest
-    needs: [typecheck]
-    steps:
-      - uses: actions/checkout@v4
-
-      - uses: pnpm/action-setup@v4
-        with:
-          version: 10
-
-      - uses: actions/setup-node@v4
-        with:
-          node-version: 20
-          cache: pnpm
-
-      - name: Install dependencies
-        run: pnpm install --frozen-lockfile
-
-      - name: Build all packages and apps
+      - name: Build all apps and packages
         run: pnpm build
+
+      - name: Start API
+        run: |
+          pnpm --filter @limitrum/api dev > api.log 2>&1 &
+          echo $! > api.pid
+
+      - name: Wait for API health
+        run: |
+          for i in {1..30}; do
+            if curl -fsS http://localhost:8000/health; then
+              exit 0
+            fi
+            sleep 1
+          done
+          cat api.log
+          exit 1
+
+      - name: Integration tests
+        run: pnpm test:integration
+
+      - name: Upload API logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: api-log
+          path: api.log

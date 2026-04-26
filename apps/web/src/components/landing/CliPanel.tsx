@@ -21,7 +21,7 @@ export function CliPanel({
     <div className="sandbox-panel">
       <div className="cli-wrap">
         <div className="cli-sidebar">
-          <div className="cli-sidebar-title">Commands</div>
+          <div className="cli-sidebar-title">Command palette</div>
           {commands.map((cmd) => (
             <button
               className={`cli-cmd-btn ${selectedCmd === cmd ? "active" : ""}`}
@@ -56,7 +56,7 @@ export function CliPanel({
               value={input}
             />
             <button className="cli-run-btn" onClick={onRun} type="button">
-              run ↵
+              Run
             </button>
           </div>
         </div>

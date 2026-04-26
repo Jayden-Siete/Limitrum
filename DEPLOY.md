@@ -46,8 +46,21 @@ REGION="us-central1" \
 SERVICE_NAME="limitrum-api" \
 DATABASE_URL="libsql://<db-name>.turso.io" \
 DATABASE_AUTH_TOKEN="<token>" \
+LIMITRUM_MASTER_API_KEY="<32+ char random secret>" \
+LIMITRUM_VERIFY_INTENT_PUBLIC="false" \
+CORS_ORIGIN="https://limitrum.com,https://www.limitrum.com" \
 LIMITRUM_API_URL="" \
 ./gcp-deploy.sh
+```
+
+### Run database migrations
+
+Run migrations against the production database before sending traffic to a new API revision:
+
+```bash
+DATABASE_URL="libsql://<db-name>.turso.io" \
+DATABASE_AUTH_TOKEN="<token>" \
+pnpm db:migrate
 ```
 
 ### Verify deployment

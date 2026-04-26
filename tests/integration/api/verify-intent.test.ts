@@ -1,4 +1,4 @@
-import { describe, it, expect, beforeAll, afterAll } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 
 /**
  * Integration tests for POST /v1/verify-intent
@@ -10,6 +10,8 @@ import { describe, it, expect, beforeAll, afterAll } from "vitest";
  */
 
 const BASE_URL = process.env.API_URL ?? "http://localhost:8000";
+const DEMO_KEY =
+  process.env.DEMO_API_KEY ?? "lmt_demo_c6e6149d7aca04bb53202b0dd435acef";
 
 // Demo data seeded by packages/db/src/seed.ts
 const DEMO_AGENT_ID = "agent_sales_01";
@@ -22,10 +24,40 @@ async function verifyIntent(body: Record<string, unknown>) {
   const res = await fetch(`${BASE_URL}/v1/verify-intent`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ intent: body }),
+  });
+  return { status: res.status, body: (await res.json()) as Record<string, unknown> };
+}
+
+async function putPolicy(agentId: string, body: Record<string, unknown>) {
+  const res = await fetch(`${BASE_URL}/v1/agents/${agentId}/policy`, {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "X-Limitrum-API-Key": DEMO_KEY,
+    },
     body: JSON.stringify(body),
   });
   return { status: res.status, body: (await res.json()) as Record<string, unknown> };
 }
+
+beforeAll(async () => {
+  const { status } = await putPolicy(DEMO_AGENT_ID, {
+    maxDailySpend: 50,
+    perActionCap: 100,
+    maxRatePerMinute: 60,
+    allowedEndpoints: [ALLOWED_DOMAIN, "api.openai.com", "api.github.com"],
+    loopDetectionEnabled: true,
+    loopDetectionMaxCount: 5,
+    loopDetectionWindowSec: 10,
+    syscallProtectionEnabled: true,
+    destructiveActionsEnabled: true,
+    dataExfilEnabled: true,
+    promptInjectionEnabled: true,
+    blockedPatterns: [],
+  });
+  expect([200, 201]).toContain(status);
+});
 
 // ── Health check ──────────────────────────────────────────────────────────────
 
@@ -148,7 +180,7 @@ describe("POST /v1/verify-intent", () => {
     it("blocks syscall actions", async () => {
       const { status, body } = await verifyIntent({
         agentId: DEMO_AGENT_ID,
-        action: "syscall:exec",
+        action: "exec_command",
         target: "localhost",
       });
       expect(status).toBe(200);

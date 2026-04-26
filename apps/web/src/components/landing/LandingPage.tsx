@@ -8,6 +8,7 @@ import { useSimulation } from "../../hooks/useSimulation";
 import { useTheme } from "../../hooks/useTheme";
 import { CodeSection } from "./CodeSection";
 import { CtaBlock } from "./CtaBlock";
+import { ArchitectureSection } from "./ArchitectureSection";
 import { Features } from "./Features";
 import { Footer } from "./Footer";
 import { Hero } from "./Hero";
@@ -26,15 +27,20 @@ type LandingPageProps = {
 
 export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   // ── Global state ────────────────────────────────────────────────
-  const [theme, toggleTheme] = useTheme("dark");
+  const [theme, toggleTheme] = useTheme("light");
   const [copied, copyToClipboard] = useCopyToClipboard(2000);
   const [activeTab, setActiveTab] = useState<TabKey>("policy");
 
+  // ── API configuration ─────────────────────────────────────────
+  const apiBaseUrl = process.env.NEXT_PUBLIC_LIMITRUM_API_URL;
+
   // ── Policy config (budget, rate, guards, domains) ───────────────
-  const pol = usePolicyConfig(defaultDomains);
+  const pol = usePolicyConfig(defaultDomains, {
+    apiBaseUrl,
+    agentId: "agent_sales_01", // Sandbox demo agent
+  });
 
   // ── Agent simulation ────────────────────────────────────────────
-  const apiBaseUrl = process.env.NEXT_PUBLIC_LIMITRUM_API_URL ?? "http://localhost:8000";
   const sim = useSimulation({
     apiBaseUrl,
     agentId: "agent_sales_01",
@@ -103,6 +109,8 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
           domains: pol.domains,
           domainInput: pol.domainInput,
           applySaved: pol.applySaved,
+          applying: pol.applying,
+          applyError: pol.applyError,
         }}
         simulation={{
           actions: agentActions,
@@ -113,6 +121,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
       />
 
       <CodeSection termLines={termLines} />
+      <ArchitectureSection />
       <Features />
       <Pricing />
       <CtaBlock />

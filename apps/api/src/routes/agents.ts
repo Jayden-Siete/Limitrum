@@ -1,6 +1,6 @@
 import { randomUUID } from "node:crypto";
 import { Hono } from "hono";
-import { db, agents, policies, organizations, eq, and } from "@limitrum/db";
+import { db, agents, policies, organizations, eq, and, sql, desc } from "@limitrum/db";
 import { z } from "zod";
 
 export const agentsRouter = new Hono<{ Variables: { organizationId: string } }>();
@@ -23,13 +23,33 @@ const updateAgentSchema = z.object({
 agentsRouter.get("/", async (c) => {
   const organizationId = c.get("organizationId");
 
+  // Pagination params
+  const limit = Math.min(Math.max(Number(c.req.query("limit") ?? 20), 1), 100);
+  const offset = Math.max(Number(c.req.query("offset") ?? 0), 0);
+
+  // Get total count
+  const totalResult = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(agents)
+    .where(eq(agents.organizationId, organizationId))
+    .then((rows) => Number(rows[0]?.count ?? 0));
+
+  // Get paginated results
   const rows = await db
     .select()
     .from(agents)
     .where(eq(agents.organizationId, organizationId))
-    .orderBy(agents.createdAt);
+    .orderBy(desc(agents.createdAt))
+    .limit(limit)
+    .offset(offset);
 
-  return c.json({ agents: rows, total: rows.length });
+  return c.json({
+    agents: rows,
+    total: totalResult,
+    limit,
+    offset,
+    hasMore: offset + rows.length < totalResult,
+  });
 });
 
 // ── POST /v1/agents ───────────────────────────────────────────────────────────

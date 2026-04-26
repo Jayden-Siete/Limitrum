@@ -4,8 +4,7 @@ const footerLinks = [
   { label: "Sandbox", href: "#sandbox", external: false },
   { label: "Pricing", href: "#pricing", external: false },
   { label: "Security", href: "https://github.com/Jayden-Siete/Limitrum/blob/main/SECURITY.md", external: true },
-  { label: "Contributing", href: "https://github.com/Jayden-Siete/Limitrum/blob/main/CONTRIBUTING.md", external: true },
-  { label: "License (MIT)", href: "https://github.com/Jayden-Siete/Limitrum/blob/main/LICENSE", external: true },
+  { label: "License", href: "https://github.com/Jayden-Siete/Limitrum/blob/main/LICENSE", external: true },
 ];
 
 type FooterProps = {
@@ -18,7 +17,7 @@ export function Footer({ theme = "dark" }: FooterProps) {
     <footer className="footer">
       <div className="section-inner footer-inner">
         <div className="footer-top">
-          <a className="footer-logo" href="#top">
+          <a className="footer-logo" href="#top" aria-label="Limitrum home">
             <img alt="Limitrum" height={20} src={logoSrc} />
           </a>
           <nav className="footer-links">
@@ -37,11 +36,11 @@ export function Footer({ theme = "dark" }: FooterProps) {
         </div>
         <div className="footer-bottom">
           <span className="footer-copy">
-            {new Date().getFullYear()} Limitrum. MIT License. Built for the age of autonomous AI.
+            {new Date().getFullYear()} Limitrum. Policy Kernel for autonomous AI agents.
           </span>
           <span className="footer-badge">
             <span className="eyebrow-dot" style={{ width: 6, height: 6 }} />
-            Open Beta
+            Open beta
           </span>
         </div>
       </div>

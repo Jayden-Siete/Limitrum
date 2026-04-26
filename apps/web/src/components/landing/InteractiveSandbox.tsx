@@ -16,6 +16,8 @@ type InteractiveSandboxProps = {
     domains: string[];
     domainInput: string;
     applySaved: boolean;
+    applying?: boolean;
+    applyError?: string | null;
   };
   simulation: {
     actions: AgentAction[];
@@ -37,7 +39,7 @@ type InteractiveSandboxProps = {
     onDomainInput: (v: string) => void;
     onDomainEnter: () => void;
     onRemoveDomain: (domain: string) => void;
-    onApplyPolicy: () => void;
+    onApplyPolicy: () => void | Promise<void>;
   };
   onSimulation: {
     onToggleAction: (id: string) => void;
@@ -50,44 +52,47 @@ type InteractiveSandboxProps = {
   };
 };
 
+const tabs: { key: TabKey; label: string; meta: string }[] = [
+  { key: "policy", label: "Policy", meta: "Define constraints" },
+  { key: "agent", label: "Simulation", meta: "Verify actions" },
+  { key: "cli", label: "CLI", meta: "Inspect kernel" },
+];
+
 export function InteractiveSandbox(props: InteractiveSandboxProps) {
   return (
-    <section className="sandbox-section section divider" id="sandbox">
+    <section className="sandbox-section section" id="sandbox">
       <div className="section-inner">
-        <p className="eyebrow-label">Interactive Sandbox</p>
-        <h2 className="section-h2">Configure. Simulate. Ship.</h2>
-        <p className="section-p">
-          Define policies, simulate real agent actions, and run CLI commands — all in the browser.
-        </p>
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow-label">Interactive sandbox</p>
+            <h2 className="section-h2">See policy become runtime behavior.</h2>
+          </div>
+          <p className="section-p">
+            Tune budgets, domain allowlists, and behavioral guards. Then run agent actions through the same verdict
+            loop your production system would call.
+          </p>
+        </div>
 
         <div className="sandbox-outer">
           <div className="sandbox-tabbar">
-            <button
-              className={`stab ${props.activeTab === "policy" ? "active" : ""}`}
-              onClick={() => props.onTab("policy")}
-              type="button"
-            >
-              Policy Config
-            </button>
-            <button
-              className={`stab ${props.activeTab === "agent" ? "active" : ""}`}
-              onClick={() => props.onTab("agent")}
-              type="button"
-            >
-              Agent Simulation
-            </button>
-            <button
-              className={`stab ${props.activeTab === "cli" ? "active" : ""}`}
-              onClick={() => props.onTab("cli")}
-              type="button"
-            >
-              $ CLI Mode
-            </button>
+            {tabs.map((tab) => (
+              <button
+                className={`stab ${props.activeTab === tab.key ? "active" : ""}`}
+                key={tab.key}
+                onClick={() => props.onTab(tab.key)}
+                type="button"
+              >
+                <span>{tab.label}</span>
+                <small>{tab.meta}</small>
+              </button>
+            ))}
           </div>
 
           {props.activeTab === "policy" ? (
             <PolicyPanel
+              applyError={props.policy.applyError}
               applySaved={props.policy.applySaved}
+              applying={props.policy.applying}
               budget={props.policy.budget}
               cost={props.policy.cost}
               domainInput={props.policy.domainInput}

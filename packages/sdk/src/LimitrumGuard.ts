@@ -1,7 +1,7 @@
 import { randomUUID } from "node:crypto";
 import { and, eq, gte, sql } from "drizzle-orm";
 import { db } from "@limitrum/db";
-import { intentLogs, policies } from "@limitrum/db";
+import { agents, intentLogs, policies } from "@limitrum/db";
 import { z } from "zod";
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -339,18 +339,26 @@ export class LimitrumGuard {
 
     if (!policy) {
       const reason = `No policy found for agent '${intent.agentId}'.`;
-      await this.writeLog({
-        agentId: intent.agentId,
-        policyId: null,
-        action: intent.action,
-        target: intent.target,
-        decision: "blocked",
-        reason,
-        guardTriggered: "no-policy",
-        amount,
-        estimatedCostUsd: intent.estimatedCostUsd ?? amount,
-        createdAt: now,
-      });
+      const agentExists = await db
+        .select({ id: agents.id })
+        .from(agents)
+        .where(eq(agents.id, intent.agentId))
+        .limit(1)
+        .then((rows) => rows.length > 0);
+      if (agentExists) {
+        await this.writeLog({
+          agentId: intent.agentId,
+          policyId: null,
+          action: intent.action,
+          target: intent.target,
+          decision: "blocked",
+          reason,
+          guardTriggered: "no-policy",
+          amount,
+          estimatedCostUsd: intent.estimatedCostUsd ?? amount,
+          createdAt: now,
+        });
+      }
       return {
         allowed: false,
         decision: "blocked",
@@ -388,15 +396,22 @@ export class LimitrumGuard {
     const metaStr = metadataToString(intent.metadata);
 
     const guards: Array<() => Promise<GuardResult> | GuardResult> = [
-      // Guard 1: Domain allowlist
+      // Guard 1: Syscall protection (high-severity local execution block)
+      () =>
+        this.checkSyscallProtection(
+          intent.action,
+          intent.target,
+          policy.syscallProtectionEnabled,
+        ),
+      // Guard 2: Domain allowlist
       () => this.checkDomainAllowlist(targetHost, allowedEndpoints),
-      // Guard 2: Daily budget cap
+      // Guard 3: Daily budget cap
       () => this.checkDailyBudget(amount, cumulativeSpent, policy.maxDailySpend, remainingBudget),
-      // Guard 3: Per-action cap
+      // Guard 4: Per-action cap
       () => this.checkPerActionCap(amount, policy.perActionCap),
-      // Guard 4: Rate limiting
+      // Guard 5: Rate limiting
       () => this.checkRateLimit(intent.agentId, policy.maxRatePerMinute, now),
-      // Guard 5: Loop detection
+      // Guard 6: Loop detection
       () =>
         this.checkLoopDetection(
           intent.agentId,
@@ -406,13 +421,6 @@ export class LimitrumGuard {
           policy.loopDetectionMaxCount,
           policy.loopDetectionWindowSec,
           now,
-        ),
-      // Guard 6: Syscall protection
-      () =>
-        this.checkSyscallProtection(
-          intent.action,
-          intent.target,
-          policy.syscallProtectionEnabled,
         ),
       // Guard 7: Destructive action guard
       () =>

@@ -3,7 +3,31 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 
-interface Policy {
+const API_BASE_URL =
+  process.env.NEXT_PUBLIC_LIMITRUM_API_URL ?? "http://localhost:8000";
+
+type Agent = {
+  id: string;
+  name: string;
+};
+
+type Policy = {
+  id: string;
+  agentId: string;
+  maxDailySpend: number;
+  perActionCap: number;
+  maxRatePerMinute: number;
+  allowedEndpoints: string[];
+  guards: {
+    loopDetection: { enabled: boolean };
+    syscallProtection: { enabled: boolean };
+    destructiveActions: { enabled: boolean };
+    dataExfil: { enabled: boolean };
+    promptInjection: { enabled: boolean };
+  };
+};
+
+type PolicyCard = {
   id: string;
   agentId: string;
   agentName: string;
@@ -18,90 +42,106 @@ interface Policy {
     dataExfil: boolean;
     promptInjection: boolean;
   };
+};
+
+function getApiKey() {
+  if (typeof window === "undefined") return null;
+  return localStorage.getItem("limitrum_api_key");
+}
+
+async function fetchWithAuth(endpoint: string) {
+  const apiKey = getApiKey();
+  const headers: Record<string, string> = { "Content-Type": "application/json" };
+  if (apiKey) headers["X-Limitrum-API-Key"] = apiKey;
+
+  const res = await fetch(`${API_BASE_URL}${endpoint}`, { headers });
+  if (!res.ok) {
+    throw new Error(`API error: ${res.status}`);
+  }
+  return res.json();
 }
 
 export default function PoliciesPage() {
-  const [policies, setPolicies] = useState<Policy[]>([]);
+  const [policies, setPolicies] = useState<PolicyCard[]>([]);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // TODO: Connect to real API
-    // GET /v1/agents + GET /v1/agents/:id/policy
-    setTimeout(() => {
-      setPolicies([
-        {
-          id: "policy_abc123",
-          agentId: "agent_sales_01",
-          agentName: "Sales Agent",
-          maxDailySpend: 100,
-          perActionCap: 10,
-          maxRatePerMinute: 30,
-          allowedEndpoints: ["api.stripe.com", "api.openai.com"],
-          guards: {
-            loopDetection: true,
-            syscallProtection: true,
-            destructiveActions: true,
-            dataExfil: true,
-            promptInjection: false,
-          },
-        },
-        {
-          id: "policy_def456",
-          agentId: "agent_support_02",
-          agentName: "Support Agent",
-          maxDailySpend: 50,
-          perActionCap: 5,
-          maxRatePerMinute: 20,
-          allowedEndpoints: ["api.stripe.com", "api.zendesk.com"],
-          guards: {
-            loopDetection: true,
-            syscallProtection: true,
-            destructiveActions: true,
-            dataExfil: false,
-            promptInjection: false,
-          },
-        },
-        {
-          id: "policy_ghi789",
-          agentId: "agent_marketing_03",
-          agentName: "Marketing Agent",
-          maxDailySpend: 75,
-          perActionCap: 0,
-          maxRatePerMinute: 0,
-          allowedEndpoints: ["api.openai.com", "api.sendgrid.com"],
-          guards: {
-            loopDetection: true,
-            syscallProtection: false,
-            destructiveActions: true,
-            dataExfil: true,
-            promptInjection: false,
-          },
-        },
-        {
-          id: "policy_jkl012",
-          agentId: "agent_dev_04",
-          agentName: "Dev Agent",
-          maxDailySpend: 25,
-          perActionCap: 2,
-          maxRatePerMinute: 10,
-          allowedEndpoints: ["api.github.com"],
-          guards: {
-            loopDetection: true,
-            syscallProtection: true,
-            destructiveActions: true,
-            dataExfil: true,
-            promptInjection: true,
-          },
-        },
-      ]);
-      setLoading(false);
-    }, 500);
+    let mounted = true;
+
+    async function load() {
+      setLoading(true);
+      setError(null);
+
+      try {
+        const agentsData = (await fetchWithAuth("/v1/agents?limit=100")) as {
+          agents: Agent[];
+        };
+        const agents = agentsData.agents ?? [];
+
+        const policyResults = await Promise.all(
+          agents.map(async (agent) => {
+            try {
+              const policyData = (await fetchWithAuth(
+                `/v1/agents/${agent.id}/policy`,
+              )) as { policy: Policy };
+              return { agent, policy: policyData.policy };
+            } catch {
+              return null;
+            }
+          }),
+        );
+
+        if (!mounted) return;
+
+        const cards: PolicyCard[] = policyResults
+          .filter((entry): entry is { agent: Agent; policy: Policy } => entry !== null)
+          .map(({ agent, policy }) => ({
+            id: policy.id,
+            agentId: policy.agentId,
+            agentName: agent.name,
+            maxDailySpend: policy.maxDailySpend,
+            perActionCap: policy.perActionCap,
+            maxRatePerMinute: policy.maxRatePerMinute,
+            allowedEndpoints: policy.allowedEndpoints,
+            guards: {
+              loopDetection: policy.guards.loopDetection.enabled,
+              syscallProtection: policy.guards.syscallProtection.enabled,
+              destructiveActions: policy.guards.destructiveActions.enabled,
+              dataExfil: policy.guards.dataExfil.enabled,
+              promptInjection: policy.guards.promptInjection.enabled,
+            },
+          }));
+
+        setPolicies(cards);
+      } catch (err) {
+        if (!mounted) return;
+        setError(err instanceof Error ? err.message : "Failed to load policies");
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    }
+
+    load();
+    return () => {
+      mounted = false;
+    };
   }, []);
 
   if (loading) {
     return (
       <div className="policies-page">
         <div className="loading">Loading policies...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="policies-page">
+        <div className="error-banner">
+          <span>{error}</span>
+        </div>
       </div>
     );
   }
@@ -166,19 +206,19 @@ export default function PoliciesPage() {
                 <h4>Active Guards</h4>
                 <div className="guards-list">
                   <div className={`guard ${policy.guards.loopDetection ? "active" : "inactive"}`}>
-                    {policy.guards.loopDetection ? "✓" : "✗"} Loop Detection
+                    {policy.guards.loopDetection ? "Yes" : "No"} Loop Detection
                   </div>
                   <div className={`guard ${policy.guards.syscallProtection ? "active" : "inactive"}`}>
-                    {policy.guards.syscallProtection ? "✓" : "✗"} Syscall Protection
+                    {policy.guards.syscallProtection ? "Yes" : "No"} Syscall Protection
                   </div>
                   <div className={`guard ${policy.guards.destructiveActions ? "active" : "inactive"}`}>
-                    {policy.guards.destructiveActions ? "✓" : "✗"} Destructive Actions
+                    {policy.guards.destructiveActions ? "Yes" : "No"} Destructive Actions
                   </div>
                   <div className={`guard ${policy.guards.dataExfil ? "active" : "inactive"}`}>
-                    {policy.guards.dataExfil ? "✓" : "✗"} Data Exfiltration
+                    {policy.guards.dataExfil ? "Yes" : "No"} Data Exfiltration
                   </div>
                   <div className={`guard ${policy.guards.promptInjection ? "active" : "inactive"}`}>
-                    {policy.guards.promptInjection ? "✓" : "✗"} Prompt Injection
+                    {policy.guards.promptInjection ? "Yes" : "No"} Prompt Injection
                   </div>
                 </div>
               </div>

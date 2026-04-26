@@ -1,64 +1,28 @@
 "use client";
 
-import { useEffect, useState } from "react";
 import Link from "next/link";
-
-interface Stats {
-  totalAgents: number;
-  activeAgents: number;
-  totalRequests: number;
-  blockedRequests: number;
-  totalSpend: number;
-  budgetLimit: number;
-}
-
-interface RecentActivity {
-  id: string;
-  action: string;
-  target: string;
-  decision: "allowed" | "blocked";
-  timestamp: string;
-}
+import { useDashboardData } from "@/hooks";
 
 export default function DashboardPage() {
-  const [stats, setStats] = useState<Stats>({
-    totalAgents: 0,
-    activeAgents: 0,
-    totalRequests: 0,
-    blockedRequests: 0,
-    totalSpend: 0,
-    budgetLimit: 0,
-  });
-  const [recentActivity, setRecentActivity] = useState<RecentActivity[]>([]);
-  const [loading, setLoading] = useState(true);
-
-  useEffect(() => {
-    // TODO: Connect to real API
-    // GET /v1/agents, GET /v1/logs, GET /v1/budget/report
-    setTimeout(() => {
-      setStats({
-        totalAgents: 5,
-        activeAgents: 3,
-        totalRequests: 1247,
-        blockedRequests: 89,
-        totalSpend: 156.32,
-        budgetLimit: 500,
-      });
-      setRecentActivity([
-        { id: "1", action: "openai.chat.completions.create", target: "api.openai.com", decision: "allowed", timestamp: "2024-01-15T10:30:00Z" },
-        { id: "2", action: "tool:stripe.charges.create", target: "api.stripe.com", decision: "allowed", timestamp: "2024-01-15T10:29:45Z" },
-        { id: "3", action: "spawn_process", target: "/bin/bash", decision: "blocked", timestamp: "2024-01-15T10:29:30Z" },
-        { id: "4", action: "http.get", target: "api.example.com", decision: "blocked", timestamp: "2024-01-15T10:29:15Z" },
-        { id: "5", action: "openai.chat.completions.create", target: "api.openai.com", decision: "allowed", timestamp: "2024-01-15T10:29:00Z" },
-      ]);
-      setLoading(false);
-    }, 500);
-  }, []);
+  const { stats, recentLogs, loading, error, refresh } = useDashboardData();
 
   if (loading) {
     return (
       <div className="dashboard-overview">
         <div className="loading">Loading dashboard...</div>
+      </div>
+    );
+  }
+
+  if (error) {
+    return (
+      <div className="dashboard-overview">
+        <div className="error">
+          <p>Error loading dashboard: {error}</p>
+          <button onClick={refresh} className="btn btn-primary">
+            Retry
+          </button>
+        </div>
       </div>
     );
   }
@@ -77,9 +41,14 @@ export default function DashboardPage() {
           <h1>Dashboard</h1>
           <p className="subtitle">Monitor your agents and security policies</p>
         </div>
-        <Link href="/dashboard/agents" className="btn btn-primary">
-          Add Agent
-        </Link>
+        <div style={{ display: "flex", gap: "8px" }}>
+          <button onClick={refresh} className="btn btn-secondary">
+            Refresh
+          </button>
+          <Link href="/dashboard/agents" className="btn btn-primary">
+            Add Agent
+          </Link>
+        </div>
       </header>
 
       <div className="stats-grid">
@@ -126,9 +95,25 @@ export default function DashboardPage() {
           </div>
           <div className="activity-card spend">
             <div className="activity-value">${stats.totalSpend.toFixed(2)}</div>
-            <div className="activity-label">Spent ({budgetUsed}% of ${stats.budgetLimit})</div>
+            <div className="activity-label">
+              Spent ({budgetUsed}% of ${stats.budgetLimit})
+            </div>
           </div>
         </div>
+
+        {Object.keys(stats.guardStats).length > 0 && (
+          <div className="guard-stats" style={{ marginTop: 16 }}>
+            <h3>Guard Breakdown</h3>
+            <div className="guard-grid">
+              {Object.entries(stats.guardStats).map(([guard, count]) => (
+                <div key={guard} className="guard-card">
+                  <span className="guard-name">{guard}</span>
+                  <span className="guard-count">{count}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         <div className="logs-table" style={{ marginTop: 24 }}>
           <table>
@@ -141,10 +126,10 @@ export default function DashboardPage() {
               </tr>
             </thead>
             <tbody>
-              {recentActivity.map((log) => (
+              {recentLogs.map((log) => (
                 <tr key={log.id}>
                   <td className="timestamp">
-                    {new Date(log.timestamp).toLocaleTimeString()}
+                    {new Date(log.createdAt).toLocaleTimeString()}
                   </td>
                   <td className="action">{log.action}</td>
                   <td className="target">{log.target}</td>
@@ -155,6 +140,13 @@ export default function DashboardPage() {
                   </td>
                 </tr>
               ))}
+              {recentLogs.length === 0 && (
+                <tr>
+                  <td colSpan={4} style={{ textAlign: "center", padding: 24 }}>
+                    No activity yet
+                  </td>
+                </tr>
+              )}
             </tbody>
           </table>
         </div>

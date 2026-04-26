@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { db, intentLogs, agents, eq, and, gte, lte, desc, sql } from "@limitrum/db";
+import { db, intentLogs, agents, eq, and, gte, lte, desc, inArray, sql } from "@limitrum/db";
 import { z } from "zod";
 
 export const logsRouter = new Hono<{ Variables: { organizationId: string } }>();
@@ -35,14 +35,14 @@ logsRouter.get("/", async (c) => {
     .from(agents)
     .where(eq(agents.organizationId, organizationId));
 
-  const orgAgentIds = new Set(orgAgents.map((a) => a.id));
+  const orgAgentIds = orgAgents.map((a) => a.id);
 
-  if (orgAgentIds.size === 0) {
+  if (orgAgentIds.length === 0) {
     return c.json({ logs: [], total: 0, limit, offset });
   }
 
   // If a specific agentId is requested, verify it belongs to this org
-  if (agentId && !orgAgentIds.has(agentId)) {
+  if (agentId && !orgAgentIds.includes(agentId)) {
     return c.json({ error: `Agent '${agentId}' not found.` }, 404);
   }
 
@@ -52,9 +52,8 @@ logsRouter.get("/", async (c) => {
   if (agentId) {
     conditions.push(eq(intentLogs.agentId, agentId));
   } else {
-    // Filter to only logs for this org's agents using SQL IN
-    const idList = [...orgAgentIds].map((id) => `'${id}'`).join(",");
-    conditions.push(sql`${intentLogs.agentId} IN (${sql.raw(idList)})`);
+    // Filter to only logs for this org's agents.
+    conditions.push(inArray(intentLogs.agentId, orgAgentIds));
   }
 
   if (decision) {

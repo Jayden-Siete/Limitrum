@@ -28,7 +28,7 @@ export function AgentSimulation({
   return (
     <div className="sandbox-panel two-cols">
       <div className="agent-left">
-        <p className="pol-section-title">Choose Agent Actions to Simulate</p>
+        <p className="pol-section-title">Agent intents</p>
         {actions.map((action) => {
           const isSelected = selected.includes(action.id);
           return (
@@ -49,25 +49,28 @@ export function AgentSimulation({
           );
         })}
         <button className={`run-sim-btn ${running ? "running" : ""}`} onClick={onRun} type="button">
-          {running ? "⟳ Running..." : "▶ Run Selected Actions"}
+          {running ? "Running verification..." : "Run selected intents"}
         </button>
       </div>
       <div className="agent-right">
-        <p className="pol-section-title">Kernel Output</p>
+        <p className="pol-section-title">Kernel verdicts</p>
         <div className="sim-results">
           {results.length === 0 ? (
-            <div className="sim-empty">Select actions on the left and click Run.</div>
+            <div className="sim-empty">
+              <span>Select intents on the left.</span>
+              <strong>Then run them through the policy kernel.</strong>
+            </div>
           ) : (
-            results.map((r) => (
-              <div className={`sim-result ${r.type === "allowed" ? "sr-allowed" : "sr-blocked"}`} key={r.id}>
+            results.map((result) => (
+              <div className={`sim-result ${result.type === "allowed" ? "sr-allowed" : "sr-blocked"}`} key={result.id}>
                 <div className="sr-header">
-                  <span className={`sr-status ${r.type === "allowed" ? "sr-ok" : "sr-err"}`}>
-                    {r.type === "allowed" ? "✓ ALLOWED" : "✗ BLOCKED"}
+                  <span className={`sr-status ${result.type === "allowed" ? "sr-ok" : "sr-err"}`}>
+                    {result.type === "allowed" ? "ALLOW" : "BLOCK"}
                   </span>
-                  <span className="sr-latency">{r.latency}ms</span>
+                  <span className="sr-latency">{result.latency}ms</span>
                 </div>
-                <div className="sr-action">{r.action}</div>
-                <div className="sr-reason">{r.reason}</div>
+                <div className="sr-action">{result.action}</div>
+                <div className="sr-reason">{result.reason}</div>
               </div>
             ))
           )}

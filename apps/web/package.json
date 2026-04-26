@@ -10,7 +10,6 @@
     "typecheck": "tsc --noEmit"
   },
   "dependencies": {
-    "@limitrum/sdk": "workspace:*",
     "class-variance-authority": "latest",
     "clsx": "latest",
     "framer-motion": "latest",

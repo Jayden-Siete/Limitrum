@@ -93,5 +93,9 @@ export const apiKeys = sqliteTable("api_keys", {
   label: text("label").notNull(),
   /** ISO date string for expiry. Null = never expires */
   expiresAt: integer("expires_at"),
+  /** Last successful authentication timestamp. Null = never used */
+  lastUsedAt: integer("last_used_at"),
+  /** Revocation timestamp. Null = active */
+  revokedAt: integer("revoked_at"),
   createdAt: integer("created_at").notNull(),
 });

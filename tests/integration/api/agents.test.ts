@@ -115,19 +115,19 @@ describe("GET /v1/agents/:id/status", () => {
 
 describe("PATCH /v1/agents/:id", () => {
   it("returns 404 for non-existent agent", async () => {
-    const { status } = await patch("/v1/agents/agent_nonexistent_xyz", { status: "inactive" });
+    const { status } = await patch("/v1/agents/agent_nonexistent_xyz", { status: "paused" });
     expect(status).toBe(404);
   });
 
-  it("updates agent status to inactive", async () => {
-    const { status, body } = await patch(`/v1/agents/${DEMO_AGENT_ID}`, { status: "inactive" });
+  it("updates agent status to paused", async () => {
+    const { status, body } = await patch(`/v1/agents/${DEMO_AGENT_ID}`, { status: "paused" });
     expect(status).toBe(200);
-    expect(body.status).toBe("inactive");
+    expect((body.agent as Record<string, unknown>).status).toBe("paused");
   });
 
   it("updates agent status back to active", async () => {
     const { status, body } = await patch(`/v1/agents/${DEMO_AGENT_ID}`, { status: "active" });
     expect(status).toBe(200);
-    expect(body.status).toBe("active");
+    expect((body.agent as Record<string, unknown>).status).toBe("active");
   });
 });

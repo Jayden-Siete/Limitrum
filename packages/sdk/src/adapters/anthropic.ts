@@ -14,9 +14,11 @@ type GuardLike = {
 };
 
 type AnthropicContentBlock = {
+  id?: string;
   type?: string;
   name?: string;
   input?: Record<string, unknown>;
+  text?: string;
 };
 
 type AnthropicResponseLike = {
@@ -24,13 +26,8 @@ type AnthropicResponseLike = {
   stop_reason?: string;
 };
 
-type AnthropicMessageParam = {
-  role: "user" | "assistant";
-  content: unknown;
-};
-
 type AnthropicCreateParams = {
-  messages?: AnthropicMessageParam[];
+  messages?: Array<{ role: "user" | "assistant"; content: unknown }>;
   system?: string;
   model?: string;
   max_tokens?: number;
@@ -50,9 +47,7 @@ type WithLimitrumAnthropicOptions = {
 
 function extractAmount(args: Record<string, unknown>) {
   const amount = args.amount;
-  if (typeof amount === "number" && Number.isFinite(amount)) {
-    return amount;
-  }
+  if (typeof amount === "number" && Number.isFinite(amount)) return amount;
   if (typeof amount === "string") {
     const parsed = Number(amount);
     return Number.isFinite(parsed) ? parsed : 0;
@@ -61,67 +56,74 @@ function extractAmount(args: Record<string, unknown>) {
 }
 
 /**
- * Wrap Anthropic messages.create to gate tool_use blocks via Limitrum.
+ * Wrap Anthropic messages.create and gate tool_use blocks via Limitrum.
  *
- * Fix: Anthropic does NOT support role:"system" inside the messages array.
- * The system prompt must be passed as a top-level `system` string parameter.
- * When a tool call is blocked, we inject the enforcement notice into the
- * top-level `system` field and re-call the model so it can respond accordingly.
+ * Flow:
+ * 1. Call Anthropic once with the original params.
+ * 2. If there are tool_use blocks, verify each one with Limitrum.
+ * 3. If any tool is blocked, issue a second Anthropic call with a top-level
+ *    `system` policy-enforcement notice (no role:system in messages).
  */
 export function withLimitrumAnthropic<TClient extends AnthropicClientLike>(
   anthropicClient: TClient,
   limitrumGuard: GuardLike,
-  options: WithLimitrumAnthropicOptions,
+  config: WithLimitrumAnthropicOptions,
 ) {
   const originalCreate = anthropicClient.messages.create.bind(anthropicClient.messages);
-  const target = options.anthropicTarget ?? "api.anthropic.com/v1/messages";
+  const target = config.anthropicTarget ?? "api.anthropic.com/v1/messages";
 
   anthropicClient.messages.create = async (params: unknown) => {
-    const firstResponse = await originalCreate(params);
-    const toolUses = (firstResponse.content ?? []).filter((block) => block.type === "tool_use");
+    const paramsObj = (params ?? {}) as AnthropicCreateParams;
+    const response = await originalCreate(paramsObj);
+    const blocks = response.content ?? [];
+
+    const toolUses = blocks.filter(
+      (block): block is AnthropicContentBlock & { type: "tool_use"; name: string } =>
+        block.type === "tool_use" && typeof block.name === "string",
+    );
 
     if (toolUses.length === 0) {
-      return firstResponse;
+      return response;
     }
 
+    const blockedReasons: string[] = [];
+
     for (const toolUse of toolUses) {
-      const toolName = toolUse.name ?? "unknown_tool";
       const toolInput = toolUse.input ?? {};
       const amount = extractAmount(toolInput);
 
       const verdict = await limitrumGuard.verify({
-        agentId: options.agentId,
-        action: `tool:${toolName}`,
+        agentId: config.agentId,
+        action: `tool:${toolUse.name}`,
         target,
         amount,
         estimatedCostUsd: amount,
         metadata: {
           integration: "anthropic-adapter",
-          toolName,
+          toolName: toolUse.name,
           toolArgs: toolInput,
         },
       });
 
       if (!verdict.allowed) {
-        const paramsObj = (params ?? {}) as AnthropicCreateParams;
-
-        // Build the enforcement notice to prepend to the system prompt.
-        const enforcementNotice = `[Limitrum Policy Enforcement] Action '${toolName}' was blocked: ${verdict.reason}. Do not attempt this action again.`;
-
-        // Anthropic requires system to be a top-level string, not a message role.
-        const existingSystem = typeof paramsObj.system === "string" ? paramsObj.system : "";
-        const updatedSystem = existingSystem
-          ? `${existingSystem}\n\n${enforcementNotice}`
-          : enforcementNotice;
-
-        return originalCreate({
-          ...paramsObj,
-          system: updatedSystem,
-        });
+        blockedReasons.push(`- ${toolUse.name}: ${verdict.reason}`);
       }
     }
 
-    return firstResponse;
+    if (blockedReasons.length === 0) {
+      return response;
+    }
+
+    const notice = `[Limitrum Policy Enforcement]\nBlocked tools:\n${blockedReasons.join("\n")}`;
+    const secondParams: AnthropicCreateParams = {
+      ...paramsObj,
+      system:
+        typeof paramsObj.system === "string" && paramsObj.system.trim() !== ""
+          ? `${paramsObj.system}\n\n${notice}`
+          : notice,
+    };
+
+    return originalCreate(secondParams);
   };
 
   return anthropicClient;

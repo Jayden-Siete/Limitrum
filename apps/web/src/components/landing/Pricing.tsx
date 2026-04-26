@@ -10,60 +10,57 @@ type Plan = {
 
 const plans: Plan[] = [
   {
-    tier: "Free",
+    tier: "Open source",
     price: "$0",
     period: "/mo",
-    verifs: "500 verifications/mo",
-    features: ["Local SQLite audit log", "3 behavioral guards", "CLI simulator", "Community support"],
-    cta: "Get started",
+    verifs: "Self-hosted core",
+    features: ["SDK and local kernel", "SQLite audit log", "Core policy checks", "Community support"],
+    cta: "Start locally",
   },
   {
-    tier: "Personal",
-    price: "$20",
+    tier: "Developer Cloud",
+    price: "$49",
     period: "/mo",
-    verifs: "5,000 verifications/mo",
-    features: ["All Free features", "10 behavioral guards", "OpenAI + Anthropic adapters", "Email support"],
-    cta: "Get started",
-  },
-  {
-    tier: "Pro",
-    price: "$50",
-    period: "/mo",
-    verifs: "20,000 verifications/mo",
-    features: ["All Personal features", "MCP server integration", "Budget reporting API", "API key management", "Priority support"],
-    cta: "Start free trial",
+    verifs: "50k verifications/mo",
+    features: ["Hosted policy API", "API key lifecycle", "Budget reports", "Email support"],
+    cta: "Open sandbox",
     featured: true,
   },
   {
-    tier: "Advanced",
-    price: "$99",
+    tier: "Team",
+    price: "$249",
     period: "/mo",
-    verifs: "100,000 verifications/mo",
-    features: ["All Pro features", "LangChain toolkit adapter", "Custom blocked patterns", "SLA 99.9%", "Slack support"],
-    cta: "Get started",
+    verifs: "500k verifications/mo",
+    features: ["Shared policies", "SIEM export", "Custom blocked patterns", "Priority support"],
+    cta: "Talk to us",
   },
   {
     tier: "Enterprise",
     price: "Custom",
-    verifs: "Unlimited verifications",
-    features: ["All Advanced features", "On-premise deployment", "Custom guard development", "Dedicated SLA", "24/7 support"],
+    verifs: "Dedicated deployment",
+    features: ["On-prem or VPC", "SLA and SSO", "Security review support", "Custom guardrails"],
     cta: "Contact sales",
   },
 ];
 
 export function Pricing() {
   return (
-    <section className="section divider" id="pricing">
+    <section className="section pricing-section" id="pricing">
       <div className="section-inner">
-        <p className="eyebrow-label">Pricing</p>
-        <h2 className="section-h2">{"Simple. Transparent. Scalable."}</h2>
-        <p className="section-p" style={{ maxWidth: 480 }}>
-          {"Start free. Scale as your agents grow. No hidden fees."}
-        </p>
+        <div className="section-heading split-heading">
+          <div>
+            <p className="eyebrow-label">Pricing</p>
+            <h2 className="section-h2">Start in code. Scale into production.</h2>
+          </div>
+          <p className="section-p">
+            The open-source core makes the developer experience credible. Hosted plans add team operations,
+            observability, key lifecycle, and production support.
+          </p>
+        </div>
         <div className="pricing-grid">
           {plans.map((plan) => (
             <article className={plan.featured ? "pc pc-featured" : "pc"} key={plan.tier}>
-              {plan.featured && <div className="pc-badge">Most Popular</div>}
+              {plan.featured && <div className="pc-badge">Best for early teams</div>}
               <div className="pc-tier">{plan.tier}</div>
               <div className="pc-price">
                 {plan.price}
@@ -71,10 +68,10 @@ export function Pricing() {
               </div>
               <div className="pc-verif">{plan.verifs}</div>
               <ul className="pc-features">
-                {plan.features.map((f) => (
-                  <li className="pc-feature-item" key={f}>
+                {plan.features.map((feature) => (
+                  <li className="pc-feature-item" key={feature}>
                     <span className="pc-check">+</span>
-                    {f}
+                    {feature}
                   </li>
                 ))}
               </ul>

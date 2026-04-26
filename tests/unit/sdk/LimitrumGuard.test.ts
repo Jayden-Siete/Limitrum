@@ -3,8 +3,10 @@ import { makeMockPolicy, makeMockIntent } from "./helpers.js";
 
 // ── Mock @limitrum/db before importing LimitrumGuard ─────────────────────────
 
-const mockInsert = vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) });
-const mockSelect = vi.fn();
+const { mockInsert, mockSelect } = vi.hoisted(() => ({
+  mockInsert: vi.fn().mockReturnValue({ values: vi.fn().mockResolvedValue(undefined) }),
+  mockSelect: vi.fn(),
+}));
 
 vi.mock("@limitrum/db", () => ({
   db: {
@@ -12,6 +14,7 @@ vi.mock("@limitrum/db", () => ({
     insert: mockInsert,
   },
   policies: {},
+  agents: {},
   intentLogs: {},
   eq: vi.fn((col: unknown, val: unknown) => ({ col, val, op: "eq" })),
   and: vi.fn((...args: unknown[]) => ({ args, op: "and" })),
@@ -118,7 +121,7 @@ describe("LimitrumGuard", () => {
       setupDbMocks(policy);
       const result = await guard.verify(makeMockIntent({ target: "api.openai.com" }));
       expect(result.allowed).toBe(false);
-      expect(result.guardTriggered).toBe("domain-allowlist");
+      expect(result.guardTriggered).toBe("data-exfil");
     });
   });
 
@@ -184,7 +187,7 @@ describe("LimitrumGuard", () => {
       const policy = makeMockPolicy({ syscallProtectionEnabled: 1 });
       setupDbMocks(policy);
       const result = await guard.verify(
-        makeMockIntent({ action: "syscall:exec", target: "api.openai.com" }),
+        makeMockIntent({ action: "exec_command", target: "api.openai.com" }),
       );
       expect(result.allowed).toBe(false);
       expect(result.guardTriggered).toBe("syscall-protection");

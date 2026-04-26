@@ -57,6 +57,8 @@ apiKeysRouter.post("/", async (c) => {
     keyHash,
     label: parsed.data.label,
     expiresAt: parsed.data.expiresAt ?? null,
+    lastUsedAt: null,
+    revokedAt: null,
     createdAt: now,
   });
 
@@ -86,6 +88,8 @@ apiKeysRouter.get("/", async (c) => {
       organizationId: apiKeys.organizationId,
       label: apiKeys.label,
       expiresAt: apiKeys.expiresAt,
+      lastUsedAt: apiKeys.lastUsedAt,
+      revokedAt: apiKeys.revokedAt,
       createdAt: apiKeys.createdAt,
     })
     .from(apiKeys)
@@ -96,6 +100,7 @@ apiKeysRouter.get("/", async (c) => {
   const enriched = rows.map((key) => ({
     ...key,
     expired: key.expiresAt !== null && key.expiresAt < now,
+    revoked: key.revokedAt !== null,
   }));
 
   return c.json({ apiKeys: enriched, total: enriched.length });
@@ -113,6 +118,8 @@ apiKeysRouter.get("/:id", async (c) => {
       organizationId: apiKeys.organizationId,
       label: apiKeys.label,
       expiresAt: apiKeys.expiresAt,
+      lastUsedAt: apiKeys.lastUsedAt,
+      revokedAt: apiKeys.revokedAt,
       createdAt: apiKeys.createdAt,
     })
     .from(apiKeys)
@@ -128,10 +135,72 @@ apiKeysRouter.get("/:id", async (c) => {
   return c.json({
     ...key,
     expired: key.expiresAt !== null && key.expiresAt < now,
+    revoked: key.revokedAt !== null,
   });
 });
 
 // ── DELETE /v1/api-keys/:id ───────────────────────────────────────────────────
+
+apiKeysRouter.post("/:id/rotate", async (c) => {
+  const organizationId = c.get("organizationId");
+  const keyId = c.req.param("id");
+
+  const existing = await db
+    .select()
+    .from(apiKeys)
+    .where(and(eq(apiKeys.id, keyId), eq(apiKeys.organizationId, organizationId)))
+    .limit(1)
+    .then((rows) => rows[0]);
+
+  if (!existing) {
+    return c.json({ error: `API key '${keyId}' not found.` }, 404);
+  }
+
+  const now = Date.now();
+  const plainKey = generateApiKey();
+  const keyHash = hashKey(plainKey);
+
+  await db
+    .update(apiKeys)
+    .set({
+      keyHash,
+      lastUsedAt: null,
+      revokedAt: null,
+      createdAt: now,
+    })
+    .where(eq(apiKeys.id, keyId));
+
+  return c.json({
+    id: keyId,
+    key: plainKey,
+    label: existing.label,
+    organizationId,
+    expiresAt: existing.expiresAt,
+    createdAt: now,
+    warning: "Store this rotated key securely. It will not be shown again.",
+  });
+});
+
+apiKeysRouter.post("/:id/revoke", async (c) => {
+  const organizationId = c.get("organizationId");
+  const keyId = c.req.param("id");
+
+  const existing = await db
+    .select()
+    .from(apiKeys)
+    .where(and(eq(apiKeys.id, keyId), eq(apiKeys.organizationId, organizationId)))
+    .limit(1)
+    .then((rows) => rows[0]);
+
+  if (!existing) {
+    return c.json({ error: `API key '${keyId}' not found.` }, 404);
+  }
+
+  const revokedAt = existing.revokedAt ?? Date.now();
+  await db.update(apiKeys).set({ revokedAt }).where(eq(apiKeys.id, keyId));
+
+  return c.json({ revoked: true, keyId, revokedAt });
+});
 
 apiKeysRouter.delete("/:id", async (c) => {
   const organizationId = c.get("organizationId");

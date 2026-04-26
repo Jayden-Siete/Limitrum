@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { evaluateDemoIntent, type RuntimePolicy } from "../lib/landingKernel";
 
 export type SimResult = {
   id: string;
@@ -18,18 +19,19 @@ export type AgentAction = {
 };
 
 type SimulationOptions = {
-  apiBaseUrl: string;
+  apiBaseUrl?: string;
   agentId: string;
   budget: number;
   rate: number;
   perActionCap: number;
-  guards: Record<string, boolean>;
+  guards: RuntimePolicy["guards"];
   domains: string[];
 };
 
-/**
- * Manages agent simulation state and runs policy-kernel verify-intent calls.
- */
+function shouldUseRemoteKernel(apiBaseUrl?: string) {
+  return Boolean(apiBaseUrl && !/localhost|127\.0\.0\.1|\[?::1\]?/.test(apiBaseUrl));
+}
+
 export function useSimulation(options: SimulationOptions) {
   const [selectedActions, setSelectedActions] = useState<string[]>(["charge-50"]);
   const [running, setRunning] = useState(false);
@@ -47,9 +49,34 @@ export function useSimulation(options: SimulationOptions) {
     setResults([]);
 
     const chosen = agentActions.filter((a) => selectedActions.includes(a.id));
+    let cumulativeSpend = 0;
 
     for (const [idx, action] of chosen.entries()) {
       const startedAt = performance.now();
+
+      if (!shouldUseRemoteKernel(options.apiBaseUrl)) {
+        await new Promise((resolve) => window.setTimeout(resolve, 150 + idx * 110));
+        const result = evaluateDemoIntent(
+          action,
+          {
+            budget: options.budget,
+            rate: options.rate,
+            perActionCap: options.perActionCap,
+            guards: options.guards,
+            domains: options.domains,
+          },
+          cumulativeSpend,
+          idx,
+        );
+
+        if (result.type === "allowed") {
+          cumulativeSpend += action.estimatedCostUsd;
+        }
+
+        setResults((prev) => [...prev, result]);
+        continue;
+      }
+
       try {
         const response = await fetch(`${options.apiBaseUrl}/v1/verify-intent`, {
           method: "POST",
@@ -101,7 +128,7 @@ export function useSimulation(options: SimulationOptions) {
             id: `${action.id}-${idx}`,
             type: "blocked",
             action: action.action,
-            reason: "Policy Kernel unavailable. Verify API is running on localhost:8000.",
+            reason: "Policy Kernel unreachable. Fail-closed: action blocked.",
             latency: elapsed,
           },
         ]);

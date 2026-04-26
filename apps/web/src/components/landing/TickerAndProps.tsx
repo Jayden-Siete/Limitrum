@@ -1,27 +1,27 @@
 const tickerItems = [
-  'BLOCKED stripe.createCharge($8,400) — budget exceeded · 18ms',
-  "BLOCKED loop_detected — 52 iterations / 9s · 1ms",
-  "ALLOWED openai.chat.completions.create — compliant · 14ms",
-  'BLOCKED fetch("api.unknown-exfil.io") — domain not whitelisted · 9ms',
-  "ALLOWED github.createIssue — api.github.com whitelisted · 12ms",
-  'BLOCKED spawn_process("/bin/sh") — syscall denied · 2ms',
+  "BLOCK stripe.charge($8,400) / budget.cap / 18ms",
+  "BLOCK loop_detected / 52 repeats / 1ms",
+  "ALLOW openai.chat.completions / provider.ok / 14ms",
+  "BLOCK fetch(api.unknown-exfil.io) / domain.not_allowed / 9ms",
+  "ALLOW github.createIssue / non_destructive / 12ms",
+  "BLOCK spawn_process('/bin/sh') / syscall.denylist / 2ms",
 ];
 
 const propsData = [
   {
     num: "01",
-    title: "Deterministic enforcement",
-    text: "The Policy Kernel runs out-of-band. No LLM can override it.",
+    title: "Deterministic by design",
+    text: "Policies execute outside the LLM path, so prompts cannot negotiate with enforcement.",
   },
   {
     num: "02",
-    title: "24ms average latency",
-    text: "Policy checks happen in under 24ms on average. Security stays fast.",
+    title: "Built for real agents",
+    text: "Budget, rate, domain, syscall, destructive action, and audit policies ship together.",
   },
   {
     num: "03",
-    title: "3-line integration",
-    text: "Install the SDK, define policy, wrap actions. No infrastructure rewrite.",
+    title: "Operational proof",
+    text: "Every verdict is logged with reason, latency, policy hash, and agent identity.",
   },
 ];
 
@@ -38,7 +38,7 @@ export function TickerAndProps() {
         </div>
       </div>
 
-      <section className="section divider">
+      <section className="section proof-section">
         <div className="section-inner">
           <div className="props-bar">
             {propsData.map((prop) => (
