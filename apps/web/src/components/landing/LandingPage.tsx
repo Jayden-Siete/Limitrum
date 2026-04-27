@@ -59,10 +59,6 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
 
   // ── Handlers ────────────────────────────────────────────────────
   const onCopyInstall = () => copyToClipboard("pnpm add @limitrum/sdk");
-  const onApplyPolicyAndShowSimulation = async () => {
-    await pol.applyPolicy();
-    setActiveTab("agent");
-  };
 
   // ── Render ──────────────────────────────────────────────────────
   return (
@@ -98,7 +94,7 @@ export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
           onDomainInput: pol.setDomainInput,
           onDomainEnter: pol.addDomain,
           onRemoveDomain: pol.removeDomain,
-          onApplyPolicy: onApplyPolicyAndShowSimulation,
+          onApplyPolicy: pol.applyPolicy,
         }}
         onSimulation={{
           onToggleAction: sim.toggleAction,

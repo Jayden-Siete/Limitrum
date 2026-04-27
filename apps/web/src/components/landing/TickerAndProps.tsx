@@ -28,14 +28,7 @@ const propsData = [
 export function TickerAndProps() {
   return (
     <>
-      <div className="ticker trust-band" aria-hidden="true">
-        <span>OPENAI AGENTS</span>
-        <span>ANTHROPIC TOOLS</span>
-        <span>LANGCHAIN</span>
-        <span>MCP SERVERS</span>
-        <span>VERCEL AI SDK</span>
-      </div>
-      <div className="ticker verdict-ticker" aria-hidden="true">
+      <div className="ticker" aria-hidden="true">
         <div className="ticker-track">
           {tickerItems.concat(tickerItems).map((item, idx) => (
             <span className="t-item" key={`${item}-${idx}`}>
@@ -45,7 +38,7 @@ export function TickerAndProps() {
         </div>
       </div>
 
-      <section className="section proof-section fundora-proof">
+      <section className="section proof-section">
         <div className="section-inner">
           <div className="props-bar">
             {propsData.map((prop) => (

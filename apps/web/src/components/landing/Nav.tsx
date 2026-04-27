@@ -1,6 +1,6 @@
 "use client";
 
-import { GitBranch, Moon, ShieldCheck, Sun } from "lucide-react";
+import { GitBranch, Moon, Sun } from "lucide-react";
 
 type NavProps = {
   theme: "dark" | "light";
@@ -9,20 +9,19 @@ type NavProps = {
 };
 
 export function Nav({ theme, onToggleTheme, logoSrc }: NavProps) {
+  const fallbackLogo = theme === "dark" ? "/limitrum-logo-white.png" : "/limitrum-logo-dark.png";
   const ThemeIcon = theme === "dark" ? Moon : Sun;
 
   return (
     <nav className="nav">
-      <a className="nav-logo fundora-logo" href="#top" aria-label="Limitrum home">
-        {logoSrc ? <img src={logoSrc} alt="Limitrum" /> : <ShieldCheck aria-hidden="true" size={25} strokeWidth={2.4} />}
-        <span>Limitrum</span>
+      <a className="nav-logo" href="#top" aria-label="Limitrum home">
+        <img src={logoSrc ?? fallbackLogo} alt="Limitrum" />
       </a>
       <div className="nav-center">
-        <a href="#top">Home</a>
         <a href="#sandbox">Sandbox</a>
+        <a href="#code">Integration</a>
         <a href="#features">Security</a>
         <a href="#pricing">Pricing</a>
-        <a href="#code">Docs</a>
       </div>
       <div className="nav-right">
         <button className="theme-toggle" onClick={onToggleTheme} type="button" aria-label="Toggle theme">
