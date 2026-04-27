@@ -33,7 +33,11 @@ function shouldUseRemoteKernel(apiBaseUrl?: string) {
 }
 
 export function useSimulation(options: SimulationOptions) {
-  const [selectedActions, setSelectedActions] = useState<string[]>(["charge-50"]);
+  const [selectedActions, setSelectedActions] = useState<string[]>([
+    "charge-50",
+    "unknown-domain",
+    "syscall",
+  ]);
   const [running, setRunning] = useState(false);
   const [results, setResults] = useState<SimResult[]>([]);
 

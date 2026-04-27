@@ -50,7 +50,7 @@ export function usePolicyConfig(
 
   const [budget, setBudget] = useState(50);
   const [rate, setRate] = useState(100);
-  const [cost, setCost] = useState(5);
+  const [cost, setCost] = useState(100);
   const [guards, setGuards] = useState<GuardConfig>({
     loopDetection: true,
     syscallProtection: true,
