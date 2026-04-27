@@ -89,14 +89,10 @@ export function Hero({ theme, onToggleTheme, copied, onCopyInstall, logoSrc, she
             <span className="eyebrow-dot" />
             Policy Kernel for autonomous AI agents
           </div>
-          <h1 className="hero-h1">
-            Give agents tools.
-            <br />
-            Keep the <em>kernel</em> in control.
-          </h1>
+          <h1 className="hero-h1">THE POLICY KERNEL FOR AI AGENTS</h1>
           <p className="hero-sub">
-            Limitrum sits between every AI intent and every real-world action: budget, rate,
-            syscall, domain, and data policies enforced before execution.
+            Limitrum gives autonomous agents a hard runtime boundary: every tool call is checked against budget,
+            syscall, network, and data policies before execution.
           </p>
 
           <div className="install-bar">
@@ -111,7 +107,7 @@ export function Hero({ theme, onToggleTheme, copied, onCopyInstall, logoSrc, she
 
           <div className="hero-sub-ctas">
             <a className="btn-lg btn-white" href="#sandbox">
-              Open sandbox
+              Test the sandbox
             </a>
             <a className="btn-lg btn-outline" href="#code">
               View integration
@@ -125,8 +121,25 @@ export function Hero({ theme, onToggleTheme, copied, onCopyInstall, logoSrc, she
           </div>
         </div>
 
-        <div className="hero-stage" aria-label="Animated Limitrum policy kernel">
-          <div className="stage-window kernel-window">
+        <div className="hero-stage fundora-stage" aria-label="Limitrum policy kernel visual">
+          <img className="kernel-gate-image" src="/limitrum-kernel-gate.png" alt="" />
+          <motion.div
+            animate={{ y: [0, -10, 0], rotate: [0, 0.5, 0] }}
+            className="hero-stat hero-stat-top"
+            transition={{ duration: 5, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+          >
+            <strong>+124k</strong>
+            <span>intents verified</span>
+          </motion.div>
+          <motion.div
+            animate={{ y: [0, 8, 0], rotate: [0, -0.4, 0] }}
+            className="hero-stat hero-stat-bottom"
+            transition={{ duration: 5.6, repeat: Number.POSITIVE_INFINITY, ease: "easeInOut" }}
+          >
+            <strong>18ms</strong>
+            <span>median verdict</span>
+          </motion.div>
+          <div className="stage-window kernel-window fundora-kernel-window">
             <div className="stage-titlebar">
               <span className="stb-dot stb-red" />
               <span className="stb-dot stb-yellow" />

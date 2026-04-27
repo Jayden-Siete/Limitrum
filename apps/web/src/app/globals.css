@@ -209,6 +209,453 @@ body {
   color: #0b1016;
 }
 
+/* Fundora-inspired premium refresh for Limitrum. */
+:root,
+[data-theme="light"] {
+  --fundora-bg: #f2f3ff;
+  --fundora-ink: #030306;
+  --fundora-muted: #2f313a;
+  --fundora-blue: #2637ff;
+  --fundora-card: rgba(255, 255, 255, 0.68);
+  --fundora-line: rgba(3, 3, 6, 0.12);
+  --text: var(--fundora-ink);
+  --text2: #1f2530;
+  --text3: #6e7280;
+  --green: #1e8c5f;
+  --cyan2: #2637ff;
+  --bg: var(--fundora-bg);
+}
+
+body {
+  background: var(--fundora-bg);
+}
+
+.nav {
+  height: 86px;
+  padding: 0 clamp(24px, 5vw, 72px);
+  background: transparent;
+  border-bottom: 0;
+  box-shadow: none;
+}
+
+.fundora-logo {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  color: #000;
+  font-size: 30px;
+  font-weight: 900;
+  letter-spacing: -0.04em;
+}
+
+.fundora-logo img {
+  height: 30px;
+  width: auto;
+}
+
+.nav-center {
+  border: 0;
+  background: transparent;
+  gap: 28px;
+  font-size: 15px;
+  color: #030306;
+}
+
+.nav-center a {
+  padding: 0;
+  border-radius: 0;
+}
+
+.theme-toggle,
+.btn-nav-secondary {
+  border: 0;
+  background: transparent;
+  color: #030306;
+  font-weight: 700;
+}
+
+.btn-nav-primary {
+  height: 48px;
+  padding: 0 26px;
+  border-radius: 999px;
+  background: #030306;
+  color: #fff;
+  font-size: 15px;
+  box-shadow: none;
+}
+
+.hero {
+  position: relative;
+  min-height: 980px;
+  padding: 112px 0 0;
+  overflow: hidden;
+  background: var(--fundora-bg);
+}
+
+.hero-grid {
+  position: relative;
+  max-width: none;
+  min-height: 850px;
+  grid-template-columns: minmax(360px, 0.44fr) minmax(640px, 0.56fr);
+  align-items: center;
+  padding: 0 clamp(36px, 7vw, 112px);
+  gap: 12px;
+}
+
+.hero-copy {
+  position: relative;
+  z-index: 4;
+  padding-top: 170px;
+}
+
+.hero-eyebrow {
+  color: #303343;
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+}
+
+.eyebrow-dot {
+  background: var(--fundora-blue);
+  box-shadow: none;
+}
+
+.hero-h1 {
+  max-width: 650px;
+  margin: 260px 0 18px;
+  color: #000;
+  font-size: clamp(48px, 4.95vw, 78px);
+  line-height: 0.95;
+  font-weight: 950;
+  letter-spacing: -0.055em;
+  text-transform: uppercase;
+}
+
+.hero-h1 em {
+  color: #000;
+}
+
+.hero-sub {
+  max-width: 690px;
+  color: #05070a;
+  font-size: 16px;
+  line-height: 1.22;
+}
+
+.install-bar {
+  display: none;
+}
+
+.hero-sub-ctas {
+  margin-top: 34px;
+}
+
+.btn-lg {
+  min-height: 50px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 999px;
+  padding: 0 30px;
+  font-weight: 850;
+}
+
+.btn-white {
+  background: var(--fundora-blue);
+  color: #fff;
+}
+
+.btn-outline {
+  background: rgba(255, 255, 255, 0.48);
+  border-color: var(--fundora-line);
+  color: #030306;
+}
+
+.trust-strip {
+  margin-top: 18px;
+  max-width: 640px;
+}
+
+.trust-strip span {
+  background: rgba(255, 255, 255, 0.5);
+  color: #4f5363;
+}
+
+.fundora-stage {
+  position: absolute;
+  inset: 70px 0 auto auto;
+  width: min(76vw, 1160px);
+  height: 900px;
+  margin: 0;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.kernel-gate-image {
+  position: absolute;
+  right: -45px;
+  top: -18px;
+  width: min(78vw, 1080px);
+  height: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 46px 54px rgba(16, 22, 42, 0.15));
+}
+
+.hero-stat {
+  position: absolute;
+  z-index: 3;
+  width: 190px;
+  padding: 22px 26px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.34);
+  border: 1px solid rgba(255, 255, 255, 0.38);
+  box-shadow: 0 24px 58px rgba(13, 18, 38, 0.14);
+  backdrop-filter: blur(14px);
+  text-align: center;
+  color: #000;
+}
+
+.hero-stat strong {
+  display: block;
+  font-size: 36px;
+  line-height: 0.95;
+  font-weight: 950;
+  letter-spacing: -0.05em;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.18);
+  padding-bottom: 8px;
+}
+
+.hero-stat span {
+  display: block;
+  padding-top: 9px;
+  font-size: 15px;
+}
+
+.hero-stat-top {
+  top: 250px;
+  right: 360px;
+}
+
+.hero-stat-bottom {
+  right: 72px;
+  bottom: 110px;
+  width: 220px;
+}
+
+.fundora-kernel-window {
+  display: none;
+}
+
+.trust-band {
+  height: 250px;
+  display: flex;
+  justify-content: space-around;
+  align-items: center;
+  gap: 38px;
+  padding: 0 64px;
+  background: #1b1b1c;
+  color: #fff;
+  font-size: clamp(22px, 2vw, 36px);
+  font-weight: 950;
+  letter-spacing: -0.04em;
+  white-space: nowrap;
+}
+
+.verdict-ticker {
+  height: 42px;
+  background: #fff;
+  border-block: 1px solid var(--fundora-line);
+}
+
+.fundora-proof,
+.sandbox-section,
+.code-section,
+.pricing-section {
+  background: #fff;
+}
+
+.props-bar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 22px;
+}
+
+.prop,
+.feat,
+.pc,
+.sandbox-outer,
+.vscode,
+.term,
+.cta-panel {
+  border-radius: 20px;
+  border: 1px solid var(--fundora-line);
+  background: rgba(255, 255, 255, 0.86);
+  box-shadow: 0 28px 72px rgba(12, 18, 32, 0.08);
+}
+
+.section {
+  padding: 120px 0;
+}
+
+.section-inner {
+  max-width: 1240px;
+}
+
+.section-h2,
+.cta-h2 {
+  color: #000;
+  font-size: clamp(42px, 5vw, 74px);
+  line-height: 0.96;
+  font-weight: 930;
+  letter-spacing: -0.055em;
+}
+
+.section-p {
+  color: #242936;
+  font-size: 17px;
+}
+
+.sandbox-outer {
+  padding: 18px;
+  background: #f8f9ff;
+}
+
+.sandbox-tabbar {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+.stab {
+  border-radius: 14px;
+  border: 1px solid transparent;
+  background: transparent;
+  color: #111;
+}
+
+.stab.active {
+  background: #fff;
+  border-color: var(--fundora-line);
+}
+
+.sandbox-panel {
+  background: transparent;
+}
+
+.pol-left,
+.pol-right,
+.agent-left,
+.agent-right,
+.cli-sidebar,
+.cli-terminal {
+  border-radius: 18px;
+  background: #fff;
+  border: 1px solid var(--fundora-line);
+}
+
+.run-sim-btn,
+.apply-btn,
+.cli-run-btn {
+  border-radius: 999px;
+  background: var(--fundora-blue);
+  color: #fff;
+}
+
+.agent-card.selected {
+  border-color: var(--fundora-blue);
+  box-shadow: inset 0 0 0 1px var(--fundora-blue);
+}
+
+.sim-result {
+  background: #f7f8ff;
+}
+
+.architecture-section {
+  background: #171718;
+}
+
+.footer {
+  background: #171718;
+}
+
+@media (max-width: 980px) {
+  .nav-center {
+    display: none;
+  }
+
+  .hero {
+    min-height: auto;
+    padding-top: 92px;
+  }
+
+  .hero-grid {
+    display: block;
+    min-height: auto;
+    padding: 0 24px 48px;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 560px;
+    padding-top: 28px;
+  }
+
+  .hero-h1 {
+    margin-top: 52px;
+    font-size: clamp(46px, 13vw, 72px);
+  }
+
+  .fundora-stage {
+    position: relative;
+    inset: auto;
+    width: 100%;
+    height: 520px;
+    margin-top: 28px;
+  }
+
+  .kernel-gate-image {
+    left: 50%;
+    right: auto;
+    top: 0;
+    width: min(760px, 150vw);
+    transform: translateX(-50%);
+  }
+
+  .hero-stat {
+    width: 160px;
+    padding: 16px;
+  }
+
+  .hero-stat strong {
+    font-size: 28px;
+  }
+
+  .hero-stat-top {
+    top: 92px;
+    right: 22px;
+  }
+
+  .hero-stat-bottom {
+    right: 18px;
+    bottom: 22px;
+  }
+
+  .trust-band {
+    height: auto;
+    min-height: 160px;
+    flex-wrap: wrap;
+    padding: 38px 24px;
+    font-size: 24px;
+  }
+
+  .split-heading,
+  .props-bar,
+  .pricing-grid,
+  .features-grid,
+  .two-cols,
+  .code-grid {
+    grid-template-columns: 1fr;
+  }
+}
+
 @media (max-width: 760px) {
   html,
   body,
