@@ -162,7 +162,11 @@ export function Hero({ theme, onToggleTheme, copied, onCopyInstall, logoSrc, she
                   transition={{ duration: 2.4, ease: "easeInOut", repeat: Number.POSITIVE_INFINITY }}
                 />
                 <div className="kernel-core">
-                  <img className="kernel-logo" src={shellSrc ?? logoSrc ?? "/limitrum-logo-white.png"} alt="" />
+                  <img
+                    className="kernel-logo"
+                    src={shellSrc ?? logoSrc ?? (theme === "light" ? "/limitrum-logo-dark.png" : "/limitrum-logo-white.png")}
+                    alt=""
+                  />
                   <span>Policy Kernel</span>
                 </div>
                 <motion.div
