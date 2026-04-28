@@ -715,22 +715,31 @@ body::before {
 .pc {
   min-height: 360px;
   padding: 22px;
+  position: relative;
 }
 
 .pc-featured {
   transform: none;
   border-color: rgba(125, 240, 189, 0.45);
+  padding-top: 58px;
 }
 
 .pc-badge {
-  top: 14px;
-  right: 14px;
+  position: absolute;
+  top: 16px;
+  right: 16px;
   left: auto;
   transform: none;
   border-radius: 99px;
   background: rgba(125, 240, 189, 0.1);
   color: #9df7ce;
   border: 1px solid rgba(125, 240, 189, 0.24);
+  max-width: calc(100% - 32px);
+  padding: 5px 12px;
+  font-size: 12px;
+  font-weight: 800;
+  line-height: 1;
+  white-space: nowrap;
 }
 
 .pc-btn {
@@ -749,21 +758,28 @@ body::before {
 
 .cta-panel {
   display: grid;
-  grid-template-columns: 160px minmax(0, 1fr) 310px;
+  grid-template-columns: 112px minmax(0, 1fr) 310px;
   gap: 28px;
   align-items: center;
   padding: 28px;
   overflow: hidden;
 }
 
-.cta-panel::before {
-  content: "";
-  width: 150px;
+.cta-logo-mark {
+  width: 96px;
+  height: 96px;
+  display: grid;
+  place-items: center;
+  align-self: center;
+  justify-self: center;
+}
+
+.cta-logo-mark img {
+  width: 92px;
   height: 92px;
-  background: url("/limitrum-logo-dark.png") center / cover no-repeat;
-  border-radius: 8px;
-  opacity: 0.5;
-  filter: grayscale(1) contrast(1.15);
+  object-fit: contain;
+  filter: invert(1) grayscale(1) brightness(1.35);
+  opacity: 0.9;
 }
 
 .cta-inner {
@@ -823,8 +839,14 @@ body::before {
     grid-template-columns: 1fr;
   }
 
-  .cta-panel::before {
-    display: none;
+  .cta-logo-mark {
+    width: 76px;
+    height: 76px;
+  }
+
+  .cta-logo-mark img {
+    width: 72px;
+    height: 72px;
   }
 
   .features-grid,
@@ -962,6 +984,51 @@ body::before {
 
   .cta-panel {
     padding: 22px;
+    text-align: center;
+  }
+
+  .cta-h2,
+  .cta-sub {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .cta-side,
+  .cta-install,
+  .cta-actions {
+    justify-items: center;
+    justify-content: center;
+  }
+
+  .cta-install {
+    text-align: center;
+  }
+
+  .pc {
+    min-height: auto;
+    padding: 24px 20px;
+    text-align: center;
+  }
+
+  .pc-featured {
+    padding-top: 64px;
+  }
+
+  .pc-badge {
+    left: 50%;
+    right: auto;
+    transform: translateX(-50%);
+    max-width: calc(100% - 40px);
+  }
+
+  .pc-feature-item {
+    justify-content: center;
+    text-align: center;
+  }
+
+  .pc-btn {
+    width: 100%;
+    justify-content: center;
   }
 
   .footer-top,
@@ -1202,6 +1269,77 @@ body::before {
 [data-theme="light"] .pol-label,
 [data-theme="light"] .toggle-row {
   color: var(--text);
+}
+
+[data-theme="light"] .cta-logo-mark img {
+  filter: none;
+  opacity: 1;
+}
+
+[data-theme="light"] .cta-sub {
+  color: #4c5558;
+}
+
+[data-theme="light"] .feat-icon,
+[data-theme="light"] .map-title,
+[data-theme="light"] .kernel-box-title,
+[data-theme="light"] .map-node,
+[data-theme="light"] .engine-cell,
+[data-theme="light"] .policy-store,
+[data-theme="light"] .map-arrows {
+  color: var(--text);
+}
+
+[data-theme="light"] .feat-icon {
+  background: rgba(9, 12, 16, 0.035);
+  border-color: rgba(9, 12, 16, 0.15);
+}
+
+[data-theme="light"] .map-title,
+[data-theme="light"] .kernel-box-title {
+  color: #101316;
+}
+
+[data-theme="light"] .map-node,
+[data-theme="light"] .engine-cell,
+[data-theme="light"] .policy-store {
+  background: rgba(9, 12, 16, 0.055);
+  color: #242b2f;
+  border-color: rgba(9, 12, 16, 0.12);
+}
+
+[data-theme="light"] .policy-store,
+[data-theme="light"] .inline-link {
+  color: #0b8d62;
+}
+
+[data-theme="light"] .stab {
+  color: #101316;
+}
+
+[data-theme="light"] .stab:not(.active),
+[data-theme="light"] .cli-cmd-btn:not(.active) {
+  color: #4f585c;
+  opacity: 1;
+}
+
+[data-theme="light"] .cli-sidebar-title,
+[data-theme="light"] .cli-prompt-sym {
+  color: #344044;
+}
+
+[data-theme="light"] .t-item {
+  color: #4a5357;
+  background: rgba(255, 255, 255, 0.74);
+  border: 1px solid rgba(9, 12, 16, 0.08);
+  border-radius: 4px;
+  padding: 3px 6px;
+}
+
+[data-theme="light"] .pc-badge {
+  background: rgba(11, 141, 98, 0.1);
+  border-color: rgba(11, 141, 98, 0.25);
+  color: #08724f;
 }
 
 [data-theme="light"] .pol-preview,

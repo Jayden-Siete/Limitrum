@@ -3,6 +3,9 @@ export function CtaBlock() {
     <section className="cta-block section">
       <div className="section-inner cta-inner">
         <div className="cta-panel">
+          <div className="cta-logo-mark" aria-hidden="true">
+            <img alt="" src="/icon-192.png" />
+          </div>
           <div>
             <div className="cta-eyebrow">
               <span className="eyebrow-dot" />
