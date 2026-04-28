@@ -27,7 +27,7 @@ type LandingPageProps = {
 
 export function LandingPage({ logoSrc, shellSrc }: LandingPageProps) {
   // ── Global state ────────────────────────────────────────────────
-  const [theme, toggleTheme] = useTheme("light");
+  const [theme, toggleTheme] = useTheme("dark");
   const [copied, copyToClipboard] = useCopyToClipboard(2000);
   const [activeTab, setActiveTab] = useState<TabKey>("policy");
 

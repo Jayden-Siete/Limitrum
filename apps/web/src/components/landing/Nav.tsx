@@ -16,6 +16,7 @@ export function Nav({ theme, onToggleTheme, logoSrc }: NavProps) {
     <nav className="nav">
       <a className="nav-logo" href="#top" aria-label="Limitrum home">
         <img src={logoSrc ?? fallbackLogo} alt="Limitrum" />
+        <span>Limitrum</span>
       </a>
       <div className="nav-center">
         <a href="#sandbox">Sandbox</a>

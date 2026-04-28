@@ -90,13 +90,13 @@ export function Hero({ theme, onToggleTheme, copied, onCopyInstall, logoSrc, she
             Policy Kernel for autonomous AI agents
           </div>
           <h1 className="hero-h1">
-            Give agents tools.
+            Govern every
             <br />
-            Keep the <em>kernel</em> in control.
+            AI <em>action.</em>
           </h1>
           <p className="hero-sub">
-            Limitrum sits between every AI intent and every real-world action: budget, rate,
-            syscall, domain, and data policies enforced before execution.
+            Limitrum sits between intent and execution, verifying, constraining,
+            and logging every action your agents take.
           </p>
 
           <div className="install-bar">
@@ -111,10 +111,10 @@ export function Hero({ theme, onToggleTheme, copied, onCopyInstall, logoSrc, she
 
           <div className="hero-sub-ctas">
             <a className="btn-lg btn-white" href="#sandbox">
-              Open sandbox
+              Get started
             </a>
             <a className="btn-lg btn-outline" href="#code">
-              View integration
+              Read the docs
             </a>
           </div>
 

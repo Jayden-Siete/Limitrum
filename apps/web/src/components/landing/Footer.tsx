@@ -19,6 +19,7 @@ export function Footer({ theme = "dark" }: FooterProps) {
         <div className="footer-top">
           <a className="footer-logo" href="#top" aria-label="Limitrum home">
             <img alt="Limitrum" height={20} src={logoSrc} />
+            <span>Limitrum</span>
           </a>
           <nav className="footer-links">
             {footerLinks.map((link) => (
