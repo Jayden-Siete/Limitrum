@@ -4,7 +4,7 @@ export function CtaBlock() {
       <div className="section-inner cta-inner">
         <div className="cta-panel">
           <div className="cta-logo-mark" aria-hidden="true">
-            <img alt="" src="/icon-192.png" />
+            <img alt="" src="/cta-logo-mark.png" />
           </div>
           <div>
             <div className="cta-eyebrow">

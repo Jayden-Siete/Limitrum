@@ -1477,3 +1477,313 @@ pre,
     overflow-wrap: anywhere;
   }
 }
+
+/* Final mobile alignment pass: hero, kernel mockup, sandbox metrics, features. */
+@media (max-width: 760px) {
+  .hero-grid {
+    padding-left: 14px;
+    padding-right: 14px;
+  }
+
+  .hero-copy {
+    width: 100%;
+    max-width: 348px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-self: center;
+    text-align: center;
+  }
+
+  .hero-eyebrow,
+  .hero-h1,
+  .hero-sub,
+  .install-bar,
+  .hero-sub-ctas,
+  .trust-strip {
+    width: 100%;
+    max-width: 330px;
+    margin-left: auto;
+    margin-right: auto;
+    text-align: center;
+  }
+
+  .hero-h1 {
+    max-width: 330px;
+    font-size: clamp(40px, 12.8vw, 48px);
+    line-height: 0.98;
+    letter-spacing: -0.04em;
+  }
+
+  .hero-sub {
+    max-width: 318px;
+  }
+
+  .install-bar,
+  .hero-sub-ctas,
+  .trust-strip {
+    max-width: 294px;
+  }
+
+  .hero-sub-ctas {
+    align-items: center;
+  }
+
+  .hero-sub-ctas .btn-lg {
+    width: 100%;
+  }
+
+  .hero-stage,
+  .stage-window,
+  .kernel-window {
+    max-width: 360px;
+  }
+
+  .hero-stage {
+    width: min(100%, 346px);
+    margin-left: auto;
+    margin-right: auto;
+    position: relative;
+    left: calc((100% - 100vw) / 2);
+    transform: none;
+  }
+
+  .stage-window,
+  .kernel-window {
+    width: 100%;
+  }
+
+  .kernel-frame {
+    padding: 10px;
+    gap: 12px;
+  }
+
+  .intent-card {
+    min-height: 72px;
+  }
+
+  .kernel-core-wrap {
+    min-height: 256px;
+  }
+
+  .verdict-panel {
+    min-height: 170px;
+  }
+
+  .risk-band,
+  .audit-row {
+    text-align: center;
+  }
+
+  .budget-meter {
+    width: 100%;
+    max-width: 220px;
+    margin: 0 auto;
+  }
+
+  .stab {
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    padding: 14px 12px;
+  }
+
+  .stab span,
+  .stab small {
+    width: 100%;
+    text-align: center;
+  }
+
+  .policy-metrics > div {
+    display: grid;
+    place-items: center;
+    text-align: center;
+  }
+
+  .policy-metrics > div span,
+  .policy-metrics > div strong {
+    text-align: center;
+  }
+
+  .feat {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    min-height: 184px;
+    text-align: center;
+  }
+
+  .feat-icon {
+    margin-left: auto;
+    margin-right: auto;
+  }
+
+  .feat-h,
+  .feat-p {
+    width: 100%;
+    text-align: center;
+  }
+
+  .cta-logo-mark {
+    display: grid;
+    margin: 0 auto 6px;
+  }
+}
+
+/* Final mobile correction: keep the requested hero, kernel mockup, and CTA mark centered. */
+@media (max-width: 760px) {
+  .hero-grid {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    margin-left: calc(50% - 50vw) !important;
+    margin-right: calc(50% - 50vw) !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+    box-sizing: border-box !important;
+    display: grid !important;
+    justify-items: center !important;
+  }
+
+  .hero-copy {
+    width: min(100%, 348px) !important;
+    max-width: 348px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    align-items: center !important;
+    justify-self: center !important;
+    text-align: center !important;
+  }
+
+  .hero-eyebrow,
+  .hero-h1,
+  .hero-sub,
+  .install-bar,
+  .hero-sub-ctas,
+  .trust-strip {
+    margin-left: auto !important;
+    margin-right: auto !important;
+    text-align: center !important;
+  }
+
+  .hero-h1 {
+    max-width: 338px !important;
+    letter-spacing: 0 !important;
+  }
+
+  .hero-sub {
+    max-width: 320px !important;
+  }
+
+  .install-bar,
+  .hero-sub-ctas {
+    width: min(100%, 294px) !important;
+    max-width: 294px !important;
+  }
+
+  .hero-sub-ctas {
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    justify-items: center !important;
+    align-items: center !important;
+    gap: 10px !important;
+  }
+
+  .hero-sub-ctas .btn-lg {
+    width: 100% !important;
+    justify-content: center !important;
+  }
+
+  .trust-strip {
+    width: min(100%, 294px) !important;
+    max-width: 294px !important;
+    justify-items: center !important;
+  }
+
+  .hero-stage {
+    width: min(100%, 348px) !important;
+    max-width: 348px !important;
+    margin: 34px auto 0 !important;
+    position: static !important;
+    left: auto !important;
+    transform: none !important;
+    justify-self: center !important;
+  }
+
+  .stage-window,
+  .kernel-window {
+    width: 100% !important;
+    max-width: 100% !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    box-sizing: border-box !important;
+  }
+
+  .kernel-frame {
+    padding: 10px !important;
+  }
+
+  .cta-logo-mark {
+    width: 86px !important;
+    height: 86px !important;
+    padding: 8px !important;
+    overflow: visible !important;
+    box-sizing: border-box !important;
+  }
+
+  .cta-logo-mark img {
+    width: 100% !important;
+    height: 100% !important;
+    max-width: 100% !important;
+    max-height: 100% !important;
+    object-fit: contain !important;
+    object-position: center !important;
+  }
+}
+
+/* Mobile overflow guard: no viewport-width offset, no cropped title/mockup. */
+@media (max-width: 760px) {
+  html,
+  body,
+  .landing-page {
+    max-width: 100%;
+    overflow-x: hidden;
+  }
+
+  .hero-grid {
+    width: 100% !important;
+    max-width: 390px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+    padding-left: 14px !important;
+    padding-right: 14px !important;
+  }
+
+  .hero-h1 {
+    max-width: 330px !important;
+    font-size: clamp(38px, 11.1vw, 44px) !important;
+    line-height: 1 !important;
+  }
+
+  .hero-stage {
+    width: min(100%, 348px) !important;
+    max-width: 348px !important;
+    margin-left: auto !important;
+    margin-right: auto !important;
+  }
+}
+
+/* Last mobile sizing guard after screenshot verification. */
+@media (max-width: 760px) {
+  .hero-sub {
+    width: min(100%, 300px) !important;
+    max-width: 300px !important;
+  }
+
+  .hero-stage {
+    width: min(calc(100vw - 60px), 330px) !important;
+    max-width: 330px !important;
+    margin-left: 0 !important;
+    margin-right: auto !important;
+  }
+}
