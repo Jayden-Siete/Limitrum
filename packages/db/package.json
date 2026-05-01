@@ -1,10 +1,29 @@
 {
   "name": "@limitrum/db",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
+  "description": "Local SQLite/libSQL policy and audit store for Limitrum.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jayden-Siete/Limitrum.git",
+    "directory": "packages/db"
+  },
+  "homepage": "https://github.com/Jayden-Siete/Limitrum#readme",
+  "bugs": {
+    "url": "https://github.com/Jayden-Siete/Limitrum/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",

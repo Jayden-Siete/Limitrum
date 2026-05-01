@@ -1,10 +1,29 @@
 {
   "name": "@limitrum/sdk",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
+  "description": "Policy kernel SDK for verifying autonomous AI agent actions before execution.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jayden-Siete/Limitrum.git",
+    "directory": "packages/sdk"
+  },
+  "homepage": "https://github.com/Jayden-Siete/Limitrum#readme",
+  "bugs": {
+    "url": "https://github.com/Jayden-Siete/Limitrum/issues"
+  },
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "exports": {
     ".": {
       "types": "./dist/index.d.ts",
@@ -34,7 +53,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@limitrum/db": "workspace:*",
+    "@limitrum/db": "workspace:^0.1.0",
     "drizzle-orm": "latest",
     "zod": "latest"
   },

@@ -101,6 +101,47 @@ pnpm --filter @limitrum/cli dev simulate
 
 The simulation creates a demo agent and runs repeated tool intents through the policy kernel without spending money on model calls.
 
+### 4. Verify real allow/block behavior
+
+Allowed target:
+
+```bash
+pnpm --filter @limitrum/cli dev verify \
+  --agent-id agent_sales_01 \
+  --action openai.chat.completions.create \
+  --target api.openai.com/v1/chat/completions \
+  --amount 1
+```
+
+Blocked exfiltration target:
+
+```bash
+pnpm --filter @limitrum/cli dev verify \
+  --agent-id agent_sales_01 \
+  --action fetch \
+  --target api.unknown-exfil.io \
+  --amount 1
+```
+
+Machine-readable verdicts:
+
+```bash
+pnpm --filter @limitrum/cli dev verify \
+  --agent-id agent_sales_01 \
+  --action fetch \
+  --target api.unknown-exfil.io \
+  --amount 1 \
+  --json
+```
+
+Use `--fail-on-block` when you want blocked verdicts to fail a CI step.
+
+One-command MVP smoke test:
+
+```bash
+pnpm smoke:mvp
+```
+
 ## SDK Example
 
 ```ts
@@ -182,6 +223,7 @@ pnpm typecheck
 pnpm lint
 pnpm test:unit
 pnpm build
+pnpm smoke:mvp
 ```
 
 ## Security

@@ -21,10 +21,10 @@ importers:
   apps/cli:
     dependencies:
       '@limitrum/db':
-        specifier: workspace:*
+        specifier: workspace:^0.1.0
         version: link:../../packages/db
       '@limitrum/sdk':
-        specifier: workspace:*
+        specifier: workspace:^0.1.0
         version: link:../../packages/sdk
       commander:
         specifier: latest
@@ -81,7 +81,7 @@ importers:
         specifier: latest
         version: 1.19.12(hono@4.12.10)
       '@limitrum/sdk':
-        specifier: workspace:*
+        specifier: workspace:^0.1.0
         version: link:../../packages/sdk
       '@modelcontextprotocol/sdk':
         specifier: latest
@@ -333,7 +333,7 @@ importers:
   packages/sdk:
     dependencies:
       '@limitrum/db':
-        specifier: workspace:*
+        specifier: workspace:^0.1.0
         version: link:../db
       drizzle-orm:
         specifier: 0.45.1

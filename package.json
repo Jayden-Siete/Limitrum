@@ -11,8 +11,9 @@
     "test:unit": "pnpm --filter @limitrum/tests test:unit",
     "db:migrate": "pnpm --filter @limitrum/db migrate",
     "db:seed": "pnpm --filter @limitrum/db seed",
+    "smoke:mvp": "node scripts/mvp-smoke.mjs",
     "hosting:prepare": "node scripts/prepare-hosting.mjs",
-    "ci": "pnpm db:migrate && pnpm db:seed && pnpm typecheck && pnpm test:unit && pnpm build",
+    "ci": "pnpm db:migrate && pnpm db:seed && pnpm --filter @limitrum/db build && pnpm --filter @limitrum/sdk build && pnpm typecheck && pnpm test:unit && pnpm build && pnpm smoke:mvp",
     "format": "turbo run format"
   },
   "devDependencies": {

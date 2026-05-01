@@ -13,6 +13,7 @@ import {
   and,
   gte,
   sql,
+  bootstrapSchema,
 } from "@limitrum/db";
 
 // ── Program setup ─────────────────────────────────────────────────────────────
@@ -24,6 +25,10 @@ program
   .name("limitrum")
   .description("Limitrum CLI — deterministic safety for autonomous agents")
   .version("0.1.0");
+
+program.hook("preAction", async () => {
+  await bootstrapSchema();
+});
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
 
@@ -51,6 +56,69 @@ function getStartOfUtcDayMs(nowMs: number) {
 }
 
 // ── simulate command ──────────────────────────────────────────────────────────
+
+program
+  .command("verify")
+  .description("Verify a single agent intent against the local policy kernel")
+  .option("--agent-id <agentId>", "Agent identifier", "agent_sales_01")
+  .requiredOption("--action <action>", "Action identifier or tool name")
+  .requiredOption("--target <target>", "Target endpoint, resource, or tool destination")
+  .option("--amount <usd>", "Transaction amount in USD")
+  .option("--cost <usd>", "Estimated action cost in USD")
+  .option("--metadata <json>", "JSON metadata object")
+  .option("--json", "Print machine-readable JSON")
+  .option("--fail-on-block", "Exit with code 2 when the policy blocks the intent")
+  .action(async (opts) => {
+    let metadata: Record<string, unknown> | undefined;
+    if (opts.metadata) {
+      try {
+        const parsed = JSON.parse(String(opts.metadata)) as unknown;
+        if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+          throw new Error("metadata must be a JSON object");
+        }
+        metadata = parsed as Record<string, unknown>;
+      } catch (error) {
+        const message = error instanceof Error ? error.message : "invalid metadata JSON";
+        console.error(`\n  Invalid --metadata JSON: ${message}\n`);
+        process.exit(1);
+      }
+    }
+
+    const amount = opts.amount === undefined ? undefined : Number(opts.amount);
+    const estimatedCostUsd = opts.cost === undefined ? amount : Number(opts.cost);
+
+    if (
+      (amount !== undefined && Number.isNaN(amount)) ||
+      (estimatedCostUsd !== undefined && Number.isNaN(estimatedCostUsd))
+    ) {
+      console.error("\n  --amount and --cost must be valid numbers.\n");
+      process.exit(1);
+    }
+
+    const result = await guard.verify({
+      agentId: String(opts.agentId),
+      action: String(opts.action),
+      target: String(opts.target),
+      amount,
+      estimatedCostUsd,
+      metadata,
+    });
+
+    if (opts.json) {
+      console.log(JSON.stringify(result, null, 2));
+      process.exit(result.allowed || !opts.failOnBlock ? 0 : 2);
+    }
+
+    const guard_ = result.guardTriggered ? ` [${result.guardTriggered}]` : "";
+    console.log(`\n  ${fmtDecision(result.decision)}${guard_}`);
+    console.log(fmt("Reason:", result.reason));
+    console.log(fmt("Policy:", result.policyId ?? "none"));
+    console.log(fmt("Cumulative spend:", `$${result.cumulativeSpent.toFixed(2)}`));
+    console.log(fmt("Remaining budget:", `$${result.remainingBudget.toFixed(2)}`));
+    console.log(fmt("Latency:", `${(result.latencyMs ?? 0).toFixed(2)}ms`));
+    console.log();
+    process.exit(result.allowed || !opts.failOnBlock ? 0 : 2);
+  });
 
 program
   .command("simulate")

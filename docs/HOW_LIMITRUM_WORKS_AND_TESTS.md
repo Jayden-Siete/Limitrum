@@ -39,14 +39,49 @@ pnpm db:seed
 ## Run The CLI Simulation
 
 ```bash
-pnpm --filter @limitrum/cli dev -- simulate
+pnpm --filter @limitrum/cli dev simulate
 ```
 
 Try a stricter run:
 
 ```bash
-pnpm --filter @limitrum/cli dev -- simulate --requests 20 --amount 50
+pnpm --filter @limitrum/cli dev simulate --requests 20 --amount 50
 ```
+
+## Verify One Intent
+
+Allowed target:
+
+```bash
+pnpm --filter @limitrum/cli dev verify \
+  --agent-id agent_sales_01 \
+  --action openai.chat.completions.create \
+  --target api.openai.com/v1/chat/completions \
+  --amount 1
+```
+
+Blocked target:
+
+```bash
+pnpm --filter @limitrum/cli dev verify \
+  --agent-id agent_sales_01 \
+  --action fetch \
+  --target api.unknown-exfil.io \
+  --amount 1
+```
+
+JSON output for automation:
+
+```bash
+pnpm --filter @limitrum/cli dev verify \
+  --agent-id agent_sales_01 \
+  --action fetch \
+  --target api.unknown-exfil.io \
+  --amount 1 \
+  --json
+```
+
+Add `--fail-on-block` if you want a blocked verdict to exit with code `2` in CI.
 
 ## Run The MCP Server
 
@@ -75,6 +110,7 @@ pnpm test:unit
 pnpm typecheck
 pnpm lint
 pnpm build
+pnpm smoke:mvp
 ```
 
 ## MVP Status
@@ -84,8 +120,10 @@ Ready for public developer demos:
 - local policy kernel works
 - SDK adapters are implemented
 - CLI simulation works without model spend
+- CLI one-off verification returns allow/block verdicts
 - MCP server exposes a guard tool
 - local audit and budget behavior are testable
+- `pnpm smoke:mvp` validates the MVP path end to end
 
 Commercial roadmap:
 

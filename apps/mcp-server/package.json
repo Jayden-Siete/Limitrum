@@ -1,16 +1,39 @@
 {
   "name": "@limitrum/mcp-server",
   "version": "0.1.0",
-  "private": true,
+  "private": false,
+  "license": "MIT",
+  "description": "MCP server exposing Limitrum policy verification as an agent tool.",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Jayden-Siete/Limitrum.git",
+    "directory": "apps/mcp-server"
+  },
+  "homepage": "https://github.com/Jayden-Siete/Limitrum#readme",
+  "bugs": {
+    "url": "https://github.com/Jayden-Siete/Limitrum/issues"
+  },
   "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md",
+    "LICENSE"
+  ],
+  "publishConfig": {
+    "access": "public"
+  },
   "scripts": {
+    "predev": "pnpm --filter @limitrum/db build && pnpm --filter @limitrum/sdk build",
     "dev": "tsx src/index.ts",
+    "predev:sse": "pnpm --filter @limitrum/db build && pnpm --filter @limitrum/sdk build",
     "dev:sse": "cross-env MCP_TRANSPORT=sse tsx src/index.ts",
     "build": "tsc -p tsconfig.json",
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@limitrum/sdk": "workspace:*",
+    "@limitrum/sdk": "workspace:^0.1.0",
     "@modelcontextprotocol/sdk": "latest",
     "cross-env": "latest",
     "hono": "latest",

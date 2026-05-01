@@ -54,3 +54,6 @@ jobs:
 
       - name: Build all apps and packages
         run: pnpm build
+
+      - name: MVP smoke test
+        run: pnpm smoke:mvp
