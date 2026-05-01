@@ -96,7 +96,7 @@ pnpm db:seed
 ### 3. Run a local simulation
 
 ```bash
-pnpm --filter @limitrum/cli dev -- simulate
+pnpm --filter @limitrum/cli dev simulate
 ```
 
 The simulation creates a demo agent and runs repeated tool intents through the policy kernel without spending money on model calls.
