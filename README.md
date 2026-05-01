@@ -1,48 +1,84 @@
-# Limitrum
+<p align="center">
+  <picture>
+    <source media="(prefers-color-scheme: dark)" srcset=".github/assets/limitrum-logo-white.png">
+    <source media="(prefers-color-scheme: light)" srcset=".github/assets/limitrum-logo-dark.png">
+    <img alt="Limitrum" src=".github/assets/limitrum-logo-dark.png" width="220">
+  </picture>
+</p>
 
-<picture>
-  <source media="(prefers-color-scheme: dark)" srcset=".github/assets/limitrum-logo-white.png">
-  <source media="(prefers-color-scheme: light)" srcset=".github/assets/limitrum-logo-dark.png">
-  <img alt="Limitrum" src=".github/assets/limitrum-logo-dark.png" width="250">
-</picture>
+<h1 align="center">Limitrum</h1>
 
-**The safety engine for autonomous systems.**  
-Deploy autonomous agents with deterministic policy enforcement, auditable decisions, and zero-cost local simulation.
+<p align="center">
+  <strong>Policy kernel for autonomous AI agents.</strong>
+</p>
 
-[![License: MIT](https://img.shields.io/badge/License-MIT-green.svg)](LICENSE)
-[![TypeScript](https://img.shields.io/badge/TypeScript-Strict-3178C6)](https://www.typescriptlang.org/)
-[![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg)](CONTRIBUTING.md)
-[![Status: Beta](https://img.shields.io/badge/Status-Beta-orange)](#)
+<p align="center">
+  Verify sensitive AI actions before they touch money, data, infrastructure, or external APIs.
+</p>
 
-## Architecture
+<p align="center">
+  <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-111111"></a>
+  <a href="SECURITY.md"><img alt="Security" src="https://img.shields.io/badge/security-responsible%20disclosure-6B8CAE"></a>
+  <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6">
+  <img alt="Status" src="https://img.shields.io/badge/status-alpha-orange">
+</p>
+
+---
+
+## What Limitrum Is
+
+Agents are starting to execute real actions: charge customers, call APIs, mutate data, open tickets, run tools, and trigger workflows.
+
+Limitrum gives those agents a hard runtime boundary:
 
 ```mermaid
 flowchart LR
-    Agent[AutonomousAgent] --> SDK[LimitrumSDK]
-    SDK --> Kernel[PolicyKernel]
-    Kernel --> Audit[SQLiteAuditLogs]
+  Agent["AI Agent"] --> Intent["Normalized Intent"]
+  Intent --> Kernel["Limitrum Policy Kernel"]
+  Kernel -->|ALLOW| Tool["Tool / API / Workflow"]
+  Kernel -->|BLOCK| Audit["Reasoned Audit Event"]
 ```
 
-## Why Limitrum?
+The open-source repo includes the local policy kernel, SDK adapters, CLI, MCP server, and examples needed to evaluate actions deterministically.
 
-- **Deterministic safety**: every tool/action intent is evaluated by explicit policy rules.
-- **Low overhead**: in-process policy checks keep latency low for critical agent loops.
-- **Privacy-first**: local SQLite + local simulation workflows avoid unnecessary third-party data exposure.
+## Open-Core Boundary
 
-## Monorepo Overview
+This repository is the **open-source core**.
 
-- `apps/web` - Next.js landing page + interactive sandbox
-- `apps/api` - Hono Policy Kernel API (`POST /v1/verify-intent`)
-- `apps/cli` - terminal CLI simulation (`limitrum simulate`)
-- `apps/mcp-server` - MCP server exposing `limitrum_guard` via stdio/SSE
-- `apps/examples/yolo-agent` - zero-cost OpenAI adapter simulation
-- `apps/examples/mcp-agent` - zero-cost MCP client simulation
-- `packages/sdk` - guard + universal adapters (OpenAI, Anthropic, LangChain)
-- `packages/db` - schema + local SQLite client
+Included here:
+
+- TypeScript policy kernel and SDK
+- Local SQLite-backed policy and audit store
+- CLI simulator
+- MCP server for local tool enforcement
+- OpenAI, Anthropic, and LangChain adapters
+- Zero-cost local examples and tests
+- Public marketing website
+
+Not included here:
+
+- Hosted Limitrum Cloud API
+- Multi-tenant dashboard
+- hosted API-key lifecycle
+- team workspaces, RBAC, SSO, SCIM
+- long-term audit retention
+- SIEM export
+- VPC / on-prem enterprise deployments
+- billing, usage metering, and support tooling
+
+See [docs/COMMERCIAL_BOUNDARY.md](docs/COMMERCIAL_BOUNDARY.md) for the product boundary.
+
+## Why Developers Use It
+
+- **Deterministic enforcement**: explicit rules return clear allow/block verdicts.
+- **Runtime budgets**: cap daily spend, per-action cost, and request rate.
+- **Tool boundary**: block dangerous actions such as unknown domains, process spawn, destructive mutations, and data exfiltration.
+- **Audit trail**: every decision can be logged locally with the reason and guard that fired.
+- **Agent-native**: wraps OpenAI, Anthropic, LangChain, MCP, and custom tool calls.
 
 ## Quickstart
 
-### 1) Clone and install
+### 1. Install
 
 ```bash
 git clone https://github.com/Jayden-Siete/Limitrum.git
@@ -50,57 +86,110 @@ cd Limitrum
 pnpm install
 ```
 
-### 2) Seed local policy data
+### 2. Prepare the local policy database
 
 ```bash
-pnpm --filter @limitrum/db seed
+pnpm db:migrate
+pnpm db:seed
 ```
 
-### 3) Run the zero-cost YOLO agent example
+### 3. Run a local simulation
 
 ```bash
-pnpm --filter @limitrum/example-yolo-agent dev
+pnpm --filter @limitrum/cli dev -- simulate
 ```
 
-This example simulates an LLM tool-call path locally and demonstrates enforcement without paid API usage.
+The simulation creates a demo agent and runs repeated tool intents through the policy kernel without spending money on model calls.
 
-## MCP Support
+## SDK Example
 
-Limitrum provides a production-grade MCP server so any MCP client can consume policy enforcement as a tool.
+```ts
+import { LimitrumGuard } from "@limitrum/sdk";
 
-- Tool: `limitrum_guard`
-- Transports:
-  - `stdio` (default)
-  - `SSE`
+const guard = new LimitrumGuard();
 
-Run it:
+const verdict = await guard.verify({
+  agentId: "billing-agent",
+  action: "stripe.createCharge",
+  target: "api.stripe.com/v1/charges",
+  estimatedCostUsd: 50,
+  metadata: {
+    customerId: "cus_123",
+    source: "agent.tool_call",
+  },
+});
+
+if (!verdict.allowed) {
+  throw new Error(`Blocked by ${verdict.guardTriggered}: ${verdict.reason}`);
+}
+```
+
+## Repository Layout
+
+```text
+apps/
+  cli/                 Local CLI simulator and policy tools
+  mcp-server/          MCP tool server for local agent enforcement
+  web/                 Public Limitrum website
+  examples/
+    yolo-agent/        Zero-cost OpenAI adapter simulation
+    mcp-agent/         Zero-cost MCP client simulation
+packages/
+  db/                  SQLite schema, migrations, seed data
+  sdk/                 Policy kernel, guards, adapters
+tests/
+  unit/                SDK and adapter tests
+docs/
+  ARCHITECTURE.md      Runtime model and guard flow
+  COMMERCIAL_BOUNDARY.md
+  HOW_LIMITRUM_WORKS_AND_TESTS.md
+```
+
+## MCP Server
+
+Run Limitrum as an MCP tool server:
 
 ```bash
 pnpm --filter @limitrum/mcp-server dev
+```
+
+Available tool:
+
+- `limitrum_guard`: verifies an intent and returns an allow/block verdict.
+
+SSE mode:
+
+```bash
 pnpm --filter @limitrum/mcp-server dev:sse
 ```
 
-Run MCP simulation:
+## Website
 
 ```bash
-pnpm --filter @limitrum/example-mcp-agent dev
+pnpm --filter @limitrum/web dev
 ```
 
-## SDK Adapters
+Production build:
 
-- OpenAI: `withLimitrum(...)`
-- Anthropic: `withLimitrumAnthropic(...)`
-- LangChain tool: `withLimitrumTool(...)`
-- LangChain toolkit: `withLimitrumToolkit(...)`
+```bash
+pnpm --filter @limitrum/web build
+```
 
-All adapters delegate to `LimitrumGuard.verify(...)` and apply hard policy-block responses consistently.
+## Quality Checks
+
+```bash
+pnpm typecheck
+pnpm lint
+pnpm test:unit
+pnpm build
+```
 
 ## Security
 
-- `.env` files are ignored; only `.env.example` is tracked.
-- local databases (`*.sqlite`, `*.db*`) are ignored.
-- report vulnerabilities via `SECURITY.md`.
+Please do not open public issues for vulnerabilities.
+
+Report security issues through [SECURITY.md](SECURITY.md).
 
 ## License
 
-MIT. See [LICENSE](LICENSE).
+The open-source core is MIT licensed. See [LICENSE](LICENSE).

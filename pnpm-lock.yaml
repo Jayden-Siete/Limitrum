@@ -18,34 +18,6 @@ importers:
         specifier: latest
         version: 6.0.2
 
-  apps/api:
-    dependencies:
-      '@hono/node-server':
-        specifier: latest
-        version: 1.19.12(hono@4.12.10)
-      '@limitrum/db':
-        specifier: workspace:*
-        version: link:../../packages/db
-      '@limitrum/sdk':
-        specifier: workspace:*
-        version: link:../../packages/sdk
-      hono:
-        specifier: latest
-        version: 4.12.10
-      zod:
-        specifier: latest
-        version: 4.3.6
-    devDependencies:
-      '@types/node':
-        specifier: latest
-        version: 25.5.0
-      tsx:
-        specifier: latest
-        version: 4.21.0
-      typescript:
-        specifier: latest
-        version: 6.0.2
-
   apps/cli:
     dependencies:
       '@limitrum/db':

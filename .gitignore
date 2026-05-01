@@ -69,3 +69,9 @@ test-results/
 tmp
 .firebase/
 .claude/
+
+# Local design/source handoff folders and generated media
+New Limitrum Website/
+videos/
+docs/Limitrum_Pitch_Deck.pdf
+Limitrum_Pitch_Deck.pdf

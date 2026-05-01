@@ -1,7 +1,5 @@
 # Security Policy
 
-## Reporting a Vulnerability
-
 Please do not open public issues for security vulnerabilities.
 
 Report vulnerabilities privately to:
@@ -10,22 +8,23 @@ Report vulnerabilities privately to:
 
 Include:
 
-- affected component(s)
-- reproduction steps / proof of concept
-- expected impact and severity estimate
-- any suggested mitigation
-
-## Response Process
-
-- We will acknowledge receipt as quickly as possible.
-- We will investigate, validate, and prioritize based on impact.
-- We will coordinate disclosure and remediation timelines with the reporter.
+- affected component
+- reproduction steps or proof of concept
+- expected impact
+- suggested mitigation, if any
 
 ## Scope
 
-This policy applies to all components in this repository, including:
+This policy applies to the public open-source core:
 
-- SDK adapters
-- Policy Kernel API
+- SDK and policy kernel
+- local database schema and migrations
+- CLI
 - MCP server
-- CLI and examples
+- adapters and examples
+
+Hosted Cloud, customer dashboards, billing, SSO, SIEM export, and enterprise deployments are commercial product surface and are not part of this public repository.
+
+## Response
+
+We will acknowledge valid reports, investigate impact, and coordinate remediation before public disclosure.

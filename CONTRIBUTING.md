@@ -1,172 +1,94 @@
 # Contributing to Limitrum
 
-Thanks for your interest in contributing to Limitrum — the safety engine for autonomous systems.
-
-## Table of Contents
-
-- [Development Setup](#development-setup)
-- [Project Structure](#project-structure)
-- [Running Tests](#running-tests)
-- [Branching and Commits](#branching-and-commits)
-- [Pull Request Checklist](#pull-request-checklist)
-- [Code Style](#code-style)
-- [Reporting Issues](#reporting-issues)
-
----
+Thanks for helping improve Limitrum, the policy kernel for autonomous AI agents.
 
 ## Development Setup
 
-### Prerequisites
+Prerequisites:
 
-- [Node.js](https://nodejs.org/) >= 20
-- [pnpm](https://pnpm.io/) >= 10 (`npm install -g pnpm`)
-
-### Steps
+- Node.js >= 20
+- pnpm >= 10
 
 ```bash
-# 1. Clone the repository
 git clone https://github.com/Jayden-Siete/Limitrum.git
 cd Limitrum
-
-# 2. Install all workspace dependencies
 pnpm install
-
-# 3. Copy environment variables
-cp .env.example .env
-
-# 4. Build internal packages (required before running apps)
-pnpm --filter @limitrum/db build
-pnpm --filter @limitrum/sdk build
-
-# 5. Seed the local SQLite database with demo data
-pnpm --filter @limitrum/db seed
-
-# 6. Start the API + web dev servers
-pnpm dev
+pnpm db:migrate
+pnpm db:seed
+pnpm build
 ```
 
-### Individual apps
+## Useful Commands
 
 ```bash
-# API server only (port 8000)
-pnpm --filter @limitrum/api dev
-
-# Web landing page only (port 3000)
 pnpm --filter @limitrum/web dev
-
-# CLI simulation
 pnpm --filter @limitrum/cli dev -- simulate
-
-# MCP server (stdio)
 pnpm --filter @limitrum/mcp-server dev
-
-# MCP server (SSE)
-pnpm --filter @limitrum/mcp-server dev:sse
-
-# YOLO agent example (zero-cost simulation)
-pnpm --filter @limitrum/example-yolo-agent dev
-
-# MCP agent example
-pnpm --filter @limitrum/example-mcp-agent dev
+pnpm test:unit
+pnpm typecheck
+pnpm lint
+pnpm build
 ```
-
----
 
 ## Project Structure
 
-```
-Limitrum/
-├── apps/
-│   ├── api/          # Hono.js REST API (port 8000)
-│   ├── cli/          # Commander.js CLI
-│   ├── mcp-server/   # MCP server (stdio + SSE)
-│   ├── web/          # Next.js 15 landing page
-│   └── examples/
-│       ├── yolo-agent/   # Zero-cost OpenAI adapter demo
-│       └── mcp-agent/    # Zero-cost MCP client demo
-├── packages/
-│   ├── db/           # Drizzle ORM schema + SQLite client
-│   └── sdk/          # LimitrumGuard + adapters
-└── tests/
-    ├── unit/         # Unit tests (vitest)
-    └── integration/  # Integration tests (vitest, requires live API)
+```text
+apps/
+  cli/                 Local CLI simulator and policy tools
+  mcp-server/          MCP server
+  web/                 Public website
+  examples/            Zero-cost local examples
+packages/
+  db/                  SQLite schema and seed data
+  sdk/                 Policy kernel and adapters
+tests/
+  unit/                SDK and adapter tests
+docs/                  Architecture and product boundary docs
 ```
 
----
+## Open-Core Boundary
 
-## Running Tests
+Please keep commercial hosted-product code out of this public repository.
 
-```bash
-# All unit tests
-pnpm --filter @limitrum/tests test:unit
+Open-source contributions should target:
 
-# All integration tests (requires API running on port 8000)
-pnpm --filter @limitrum/tests test:integration
+- policy kernel behavior
+- SDK adapters
+- local audit and policy storage
+- CLI and MCP workflows
+- docs, examples, and tests
 
-# With coverage
-pnpm --filter @limitrum/tests test:coverage
+Do not add:
 
-# Watch mode
-pnpm --filter @limitrum/tests test:watch
-```
+- hosted Cloud API implementation
+- billing or usage metering
+- customer dashboard code
+- team workspace/RBAC/SSO implementations
+- SIEM export or long-term hosted retention
+- private deployment runbooks or customer-specific configs
 
----
-
-## Branching and Commits
-
-- **Base branch for active work**: `dev`
-- **Stable branch**: `main` (merged from `dev` on releases)
-- Keep pull requests focused and atomic
-- Follow [Conventional Commits](https://www.conventionalcommits.org/) style:
-
-| Prefix | When to use |
-|--------|-------------|
-| `feat:` | New feature or capability |
-| `fix:` | Bug fix |
-| `docs:` | Documentation only |
-| `refactor:` | Code restructure without behavior change |
-| `test:` | Adding or updating tests |
-| `chore:` | Build, CI, tooling changes |
-| `perf:` | Performance improvement |
-| `style:` | Formatting, whitespace |
-| `ci:` | CI/CD pipeline changes |
-
-### Examples
-
-```
-feat(sdk): add per-action cost cap guard
-fix(anthropic): use top-level system param instead of messages array
-test(api): add integration tests for /v1/api-keys
-docs: update CONTRIBUTING.md with project structure
-ci: add GitHub Actions CI workflow
-```
-
----
+See [docs/COMMERCIAL_BOUNDARY.md](docs/COMMERCIAL_BOUNDARY.md).
 
 ## Pull Request Checklist
 
-- [ ] `pnpm typecheck` passes with no errors
-- [ ] `pnpm --filter @limitrum/tests test:unit` passes
-- [ ] New behavior is covered by tests
-- [ ] Docs updated for user-facing changes
-- [ ] No secrets committed (`.env`, API keys, credentials)
-- [ ] CHANGELOG.md updated under `[Unreleased]`
+- [ ] `pnpm typecheck` passes
+- [ ] `pnpm lint` passes
+- [ ] `pnpm test:unit` passes
+- [ ] `pnpm build` passes
+- [ ] docs are updated for user-facing changes
+- [ ] no secrets, local databases, or generated artifacts are committed
 
----
+## Commit Style
 
-## Code Style
+Use Conventional Commits:
 
-- **TypeScript strict mode** — no `any` unless absolutely necessary
-- **Small, composable modules** — one responsibility per file
-- **Deterministic policy logic** — guards must be predictable and auditable
-- **Explicit error messages** — always explain *why* something was blocked
-- **No silent failures** — log or throw, never swallow errors
+- `feat:` new capability
+- `fix:` bug fix
+- `docs:` documentation
+- `test:` tests
+- `chore:` tooling or maintenance
+- `refactor:` internal code structure
 
----
+## Security
 
-## Reporting Issues
-
-- Use clear reproduction steps
-- Include environment details (`node --version`, `pnpm --version`, OS)
-- Attach relevant logs or error output
-- For security-sensitive issues, follow the process in [`SECURITY.md`](SECURITY.md)
+For vulnerabilities, do not open a public issue. Follow [SECURITY.md](SECURITY.md).

@@ -4,9 +4,9 @@ import { db } from "@limitrum/db";
 import { agents, intentLogs, policies } from "@limitrum/db";
 import { z } from "zod";
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Input / Output types
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const verifyIntentInputSchema = z.object({
   agentId: z.string().min(1),
@@ -30,9 +30,9 @@ export type VerifyIntentResult = {
   latencyMs?: number;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Guard result helper
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 type BlockResult = {
   blocked: true;
@@ -46,9 +46,9 @@ type PassResult = {
 
 type GuardResult = BlockResult | PassResult;
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Utility helpers
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 function normalizeTargetHost(target: string): string {
   try {
@@ -105,9 +105,9 @@ function metadataToString(metadata: Record<string, unknown> | undefined): string
   }
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Syscall protection patterns
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const SYSCALL_TARGET_PATTERNS = [
   /^local\.syscall/i,
@@ -133,9 +133,9 @@ const SYSCALL_ACTION_PATTERNS = [
   /spawnSync/i,
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Destructive action patterns
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const DESTRUCTIVE_ACTION_PATTERNS = [
   /\bDELETE\b.*\bFROM\b/i,
@@ -158,9 +158,9 @@ const DESTRUCTIVE_TARGET_PATTERNS = [
   /local\.fs\/wipe/i,
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // Prompt injection patterns
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 
 const PROMPT_INJECTION_PATTERNS = [
   /ignore\s+(all\s+)?previous\s+instructions/i,
@@ -177,16 +177,14 @@ const PROMPT_INJECTION_PATTERNS = [
   /\bignore\b.*\bsystem\s+prompt\b/i,
 ];
 
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
 // LimitrumGuard options
-// ─────────────────────────────────────────────────────────────────────────────
-
-const DEFAULT_PRODUCTION_API_URL = "https://api.limitrum.cloud";
+// -----------------------------------------------------------------------------
 
 export type LimitrumGuardOptions = {
   /**
    * Base URL of the Limitrum Policy Kernel API.
-   * When set, the guard operates in HTTP client mode — no local DB required.
+   * When set, the guard operates in HTTP client mode - no local DB required.
    * When omitted, the guard uses the local SQLite database directly.
    */
   baseUrl?: string;
@@ -196,9 +194,9 @@ export type LimitrumGuardOptions = {
   apiKey?: string;
 };
 
-// ─────────────────────────────────────────────────────────────────────────────
-// LimitrumGuard — The Policy Kernel
-// ─────────────────────────────────────────────────────────────────────────────
+// -----------------------------------------------------------------------------
+// LimitrumGuard - The Policy Kernel
+// -----------------------------------------------------------------------------
 
 export class LimitrumGuard {
   public readonly baseUrl: string | null;
@@ -213,18 +211,14 @@ export class LimitrumGuard {
     this.apiKey = options.apiKey ?? envApiKey;
 
     // Determine mode:
-    // 1. If baseUrl is explicitly provided → HTTP mode
-    // 2. If LIMITRUM_API_URL env is set and non-empty → HTTP mode
-    // 3. If NODE_ENV=production and no explicit local override → HTTP mode (default prod URL)
-    // 4. Otherwise → local DB mode
+    // 1. If baseUrl is explicitly provided -> HTTP mode
+    // 2. If LIMITRUM_API_URL env is set and non-empty -> HTTP mode
+    // 3. Otherwise -> local DB mode
     if (options.baseUrl) {
       this.baseUrl = options.baseUrl;
       this.httpMode = true;
     } else if (envApiUrl && envApiUrl.trim() !== "" && envApiUrl !== "http://localhost:8000") {
       this.baseUrl = envApiUrl;
-      this.httpMode = true;
-    } else if (process.env.NODE_ENV === "production" && !envApiUrl) {
-      this.baseUrl = DEFAULT_PRODUCTION_API_URL;
       this.httpMode = true;
     } else {
       this.baseUrl = null;
@@ -232,9 +226,9 @@ export class LimitrumGuard {
     }
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
   // Public API
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
 
   async verify(input: VerifyIntentInput): Promise<VerifyIntentResult> {
     const startedAt = performance.now();
@@ -246,9 +240,9 @@ export class LimitrumGuard {
     return this.verifyViaDb(input, startedAt);
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // HTTP client mode — delegates to the Limitrum API
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
+  // HTTP client mode - delegates to the Limitrum API
+  // ---------------------------------------------------------------------------
 
   private async verifyViaHttp(
     input: VerifyIntentInput,
@@ -271,7 +265,7 @@ export class LimitrumGuard {
       });
     } catch (err) {
       // Fail-safe: if the API is unreachable, block the action.
-      const reason = `Limitrum API unreachable (${err instanceof Error ? err.message : "network error"}). Failing safe — action blocked.`;
+      const reason = `Limitrum API unreachable (${err instanceof Error ? err.message : "network error"}). Failing safe - action blocked.`;
       return {
         allowed: false,
         decision: "blocked",
@@ -284,7 +278,7 @@ export class LimitrumGuard {
     }
 
     if (!response.ok) {
-      const reason = `Limitrum API returned HTTP ${response.status}. Failing safe — action blocked.`;
+      const reason = `Limitrum API returned HTTP ${response.status}. Failing safe - action blocked.`;
       return {
         allowed: false,
         decision: "blocked",
@@ -317,9 +311,9 @@ export class LimitrumGuard {
     };
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
-  // Local DB mode — full policy evaluation in-process
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
+  // Local DB mode - full policy evaluation in-process
+  // ---------------------------------------------------------------------------
 
   private async verifyViaDb(
     rawInput: VerifyIntentInput,
@@ -329,7 +323,7 @@ export class LimitrumGuard {
     const now = Date.now();
     const amount = intent.amount ?? intent.estimatedCostUsd ?? 0;
 
-    // ── 1. Load policy ──────────────────────────────────────────────────────
+    // -- 1. Load policy ------------------------------------------------------
     const policy = await db
       .select()
       .from(policies)
@@ -370,7 +364,7 @@ export class LimitrumGuard {
       };
     }
 
-    // ── 2. Compute cumulative spend for today ───────────────────────────────
+    // -- 2. Compute cumulative spend for today -------------------------------
     const startOfUtcDay = getStartOfUtcDayTimestampMs(now);
     const aggregate = await db
       .select({
@@ -389,7 +383,7 @@ export class LimitrumGuard {
     const cumulativeSpent = Number(aggregate?.total ?? 0);
     const remainingBudget = Math.max(0, policy.maxDailySpend - cumulativeSpent);
 
-    // ── 3. Run all guards in order ──────────────────────────────────────────
+    // -- 3. Run all guards in order ------------------------------------------
     const targetHost = normalizeTargetHost(intent.target);
     const allowedEndpoints = parseAllowlist(policy.allowedEndpoints);
     const blockedPatterns = parseBlockedPatterns(policy.blockedPatterns);
@@ -461,7 +455,7 @@ export class LimitrumGuard {
       }
     }
 
-    // ── 4. Write audit log ──────────────────────────────────────────────────
+    // -- 4. Write audit log --------------------------------------------------
     await this.writeLog({
       agentId: intent.agentId,
       policyId: policy.id,
@@ -487,14 +481,14 @@ export class LimitrumGuard {
     };
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
   // Individual Guards
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
 
-  /** Guard 1 — Domain allowlist */
+  /** Guard 1 - Domain allowlist */
   private checkDomainAllowlist(targetHost: string, allowedEndpoints: string[]): GuardResult {
     if (allowedEndpoints.length === 0) {
-      // No allowlist configured → pass (open policy)
+      // No allowlist configured -> pass (open policy)
       return { blocked: false };
     }
     const isAllowed = allowedEndpoints.some(
@@ -510,7 +504,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 2 — Daily budget cap */
+  /** Guard 2 - Daily budget cap */
   private checkDailyBudget(
     amount: number,
     cumulativeSpent: number,
@@ -527,7 +521,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 3 — Per-action cost cap */
+  /** Guard 3 - Per-action cost cap */
   private checkPerActionCap(amount: number, perActionCap: number): GuardResult {
     if (perActionCap > 0 && amount > perActionCap) {
       return {
@@ -539,7 +533,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 4 — Rate limiting (actions per minute) */
+  /** Guard 4 - Rate limiting (actions per minute) */
   private async checkRateLimit(
     agentId: string,
     maxRatePerMinute: number,
@@ -569,7 +563,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 5 — Loop detection (repeated identical action+target in a time window) */
+  /** Guard 5 - Loop detection (repeated identical action+target in a time window) */
   private async checkLoopDetection(
     agentId: string,
     action: string,
@@ -605,7 +599,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 6 — Syscall / process-spawn protection */
+  /** Guard 6 - Syscall / process-spawn protection */
   private checkSyscallProtection(
     action: string,
     target: string,
@@ -634,7 +628,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 7 — Destructive action guard */
+  /** Guard 7 - Destructive action guard */
   private checkDestructiveActions(
     action: string,
     target: string,
@@ -663,7 +657,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 8 — Data exfiltration detection */
+  /** Guard 8 - Data exfiltration detection */
   private checkDataExfil(
     targetHost: string,
     allowedEndpoints: string[],
@@ -671,7 +665,7 @@ export class LimitrumGuard {
   ): GuardResult {
     if (!enabled) return { blocked: false };
     // Data exfil = external domain not in allowlist
-    // This is a secondary check after domain allowlist — catches cases where
+    // This is a secondary check after domain allowlist - catches cases where
     // allowlist is empty but dataExfil guard is explicitly enabled.
     if (allowedEndpoints.length > 0) {
       // Already handled by domain allowlist guard
@@ -694,7 +688,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 9 — Prompt injection shield */
+  /** Guard 9 - Prompt injection shield */
   private checkPromptInjection(
     action: string,
     metaStr: string,
@@ -715,7 +709,7 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  /** Guard 10 — Custom blocked patterns (user-defined regex) */
+  /** Guard 10 - Custom blocked patterns (user-defined regex) */
   private checkBlockedPatterns(
     action: string,
     target: string,
@@ -736,9 +730,9 @@ export class LimitrumGuard {
     return { blocked: false };
   }
 
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
   // Audit log writer
-  // ───────────────────────────────────────────────────────────────────────────
+  // ---------------------------------------------------------------------------
 
   private async writeLog(entry: {
     agentId: string;

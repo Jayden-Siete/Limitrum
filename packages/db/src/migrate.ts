@@ -3,14 +3,6 @@ import { sqlite } from "./client.js";
 
 const MIGRATION_VERSION = "0001_initial_schema";
 
-async function addColumnIfMissing(table: string, column: string, definition: string) {
-  const info = await sqlite.execute(`PRAGMA table_info(${table})`);
-  const hasColumn = info.rows.some((row) => row.name === column);
-  if (!hasColumn) {
-    await sqlite.execute(`ALTER TABLE ${table} ADD COLUMN ${definition}`);
-  }
-}
-
 export async function bootstrapSchema() {
   const ddl = [
     `CREATE TABLE IF NOT EXISTS schema_migrations (
@@ -65,15 +57,6 @@ export async function bootstrapSchema() {
       FOREIGN KEY (agent_id) REFERENCES agents(id),
       FOREIGN KEY (policy_id) REFERENCES policies(id)
     )`,
-    `CREATE TABLE IF NOT EXISTS api_keys (
-      id TEXT PRIMARY KEY NOT NULL,
-      organization_id TEXT NOT NULL,
-      key_hash TEXT NOT NULL UNIQUE,
-      label TEXT NOT NULL,
-      expires_at INTEGER,
-      created_at INTEGER NOT NULL,
-      FOREIGN KEY (organization_id) REFERENCES organizations(id)
-    )`,
     `CREATE INDEX IF NOT EXISTS idx_intent_logs_agent_created
       ON intent_logs(agent_id, created_at)`,
     `CREATE INDEX IF NOT EXISTS idx_intent_logs_agent_decision
@@ -87,9 +70,6 @@ export async function bootstrapSchema() {
   for (const statement of ddl) {
     await sqlite.execute(statement);
   }
-
-  await addColumnIfMissing("api_keys", "last_used_at", "last_used_at INTEGER");
-  await addColumnIfMissing("api_keys", "revoked_at", "revoked_at INTEGER");
 }
 
 async function migrate() {

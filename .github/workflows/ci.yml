@@ -17,9 +17,6 @@ jobs:
     timeout-minutes: 20
     env:
       DATABASE_URL: ./limitrum-ci.sqlite
-      LIMITRUM_MASTER_API_KEY: ci_master_key_000000000000000000000000
-      LIMITRUM_VERIFY_INTENT_PUBLIC: "true"
-      CORS_ORIGIN: http://localhost:3000
     steps:
       - uses: actions/checkout@v4
 
@@ -57,29 +54,3 @@ jobs:
 
       - name: Build all apps and packages
         run: pnpm build
-
-      - name: Start API
-        run: |
-          pnpm --filter @limitrum/api dev > api.log 2>&1 &
-          echo $! > api.pid
-
-      - name: Wait for API health
-        run: |
-          for i in {1..30}; do
-            if curl -fsS http://localhost:8000/health; then
-              exit 0
-            fi
-            sleep 1
-          done
-          cat api.log
-          exit 1
-
-      - name: Integration tests
-        run: pnpm test:integration
-
-      - name: Upload API logs on failure
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: api-log
-          path: api.log
