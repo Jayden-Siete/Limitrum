@@ -3,6 +3,10 @@
 MCP server that exposes Limitrum policy verification as a tool named `limitrum_guard`.
 
 ```bash
+pnpm add @limitrum/mcp-server
+```
+
+```bash
 pnpm --filter @limitrum/mcp-server dev
 ```
 

@@ -2,6 +2,10 @@
 
 TypeScript policy kernel SDK for verifying autonomous AI agent actions before execution.
 
+```bash
+pnpm add @limitrum/sdk @limitrum/db
+```
+
 ```ts
 import { LimitrumGuard } from "@limitrum/sdk";
 

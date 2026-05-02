@@ -3,6 +3,10 @@
 Command-line tools for the Limitrum local policy kernel.
 
 ```bash
+pnpm add -D @limitrum/cli
+```
+
+```bash
 limitrum verify \
   --agent-id agent_sales_01 \
   --action openai.chat.completions.create \

@@ -18,6 +18,7 @@
 
 <p align="center">
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-111111"></a>
+  <a href="https://www.npmjs.com/package/@limitrum/sdk"><img alt="npm sdk" src="https://img.shields.io/npm/v/@limitrum/sdk?label=%40limitrum%2Fsdk&color=111111"></a>
   <a href="SECURITY.md"><img alt="Security" src="https://img.shields.io/badge/security-responsible%20disclosure-6B8CAE"></a>
   <img alt="TypeScript" src="https://img.shields.io/badge/TypeScript-strict-3178C6">
   <img alt="Status" src="https://img.shields.io/badge/status-alpha-orange">
@@ -94,7 +95,35 @@ pnpm smoke:mvp
 
 ## Quickstart
 
-### 1. Install
+### Option A: Install from npm
+
+For an app that wants to integrate the SDK directly:
+
+```bash
+pnpm add @limitrum/sdk @limitrum/db
+```
+
+For the CLI:
+
+```bash
+pnpm add -D @limitrum/cli
+pnpm exec limitrum verify \
+  --agent-id agent_sales_01 \
+  --action openai.chat.completions.create \
+  --target api.openai.com/v1/chat/completions \
+  --amount 1
+```
+
+Published packages:
+
+- [`@limitrum/sdk`](https://www.npmjs.com/package/@limitrum/sdk)
+- [`@limitrum/db`](https://www.npmjs.com/package/@limitrum/db)
+- [`@limitrum/cli`](https://www.npmjs.com/package/@limitrum/cli)
+- [`@limitrum/mcp-server`](https://www.npmjs.com/package/@limitrum/mcp-server)
+
+### Option B: Run the repo locally
+
+#### 1. Install
 
 ```bash
 git clone https://github.com/Jayden-Siete/Limitrum.git
@@ -102,14 +131,14 @@ cd Limitrum
 pnpm install
 ```
 
-### 2. Prepare the local policy database
+#### 2. Prepare the local policy database
 
 ```bash
 pnpm db:migrate
 pnpm db:seed
 ```
 
-### 3. Run a local simulation
+#### 3. Run a local simulation
 
 ```bash
 pnpm --filter @limitrum/cli dev simulate
@@ -117,7 +146,7 @@ pnpm --filter @limitrum/cli dev simulate
 
 The simulation creates a demo agent and runs repeated tool intents through the policy kernel without spending money on model calls.
 
-### 4. Verify real allow/block behavior
+#### 4. Verify real allow/block behavior
 
 Allowed target:
 
