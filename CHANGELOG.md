@@ -6,20 +6,9 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 ## [Unreleased]
 
-### Changed
+No unreleased changes yet.
 
-- Repositioned the public repository as the open-source core.
-- Replaced the public website with the new Limitrum Vite landing site.
-- Clarified the commercial boundary for hosted Cloud/API/dashboard capabilities.
-- Removed hosted API implementation, Cloud Run deployment files, production runbook, and API integration tests from the public repo.
-
-### Added
-
-- `docs/ARCHITECTURE.md`
-- `docs/COMMERCIAL_BOUNDARY.md`
-- clearer README quickstart, architecture, and open-core sections
-
-## [0.1.0] - 2026-05-01
+## [0.1.0] - 2026-05-02
 
 ### Added
 
@@ -32,6 +21,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 - zero-cost local examples
 - unit tests
 - public website
+- `limitrum verify` CLI command for one-off allow/block verdicts
+- `pnpm smoke:mvp` end-to-end MVP smoke test
+- MVP demo GIF/MP4 for the GitHub README
+- package README files and npm publish metadata for SDK, DB, CLI, and MCP server
+- `docs/ARCHITECTURE.md`
+- `docs/COMMERCIAL_BOUNDARY.md`
+
+### Changed
+
+- Repositioned the public repository as the open-source core.
+- Replaced the public website with the new Limitrum Vite landing site.
+- Clarified the commercial boundary for hosted Cloud/API/dashboard capabilities.
+- Removed hosted API implementation, Cloud Run deployment files, production runbook, and API integration tests from the public repo.
 
 [Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.0...HEAD
 [0.1.0]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.0

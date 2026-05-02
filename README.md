@@ -23,6 +23,10 @@
   <img alt="Status" src="https://img.shields.io/badge/status-alpha-orange">
 </p>
 
+<p align="center">
+  <img alt="Limitrum MVP demo" src=".github/assets/limitrum-demo.gif" width="920">
+</p>
+
 ---
 
 ## What Limitrum Is
