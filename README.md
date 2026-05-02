@@ -17,6 +17,14 @@
 </p>
 
 <p align="center">
+  <a href="https://limitrum.com">Website</a>
+  ·
+  <a href="https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.0">Release</a>
+  ·
+  <a href="https://www.npmjs.com/package/@limitrum/sdk">npm</a>
+</p>
+
+<p align="center">
   <a href="LICENSE"><img alt="License" src="https://img.shields.io/badge/license-MIT-111111"></a>
   <a href="https://www.npmjs.com/package/@limitrum/sdk"><img alt="npm sdk" src="https://img.shields.io/npm/v/@limitrum/sdk?label=%40limitrum%2Fsdk&color=111111"></a>
   <a href="SECURITY.md"><img alt="Security" src="https://img.shields.io/badge/security-responsible%20disclosure-6B8CAE"></a>
@@ -248,6 +256,8 @@ pnpm --filter @limitrum/mcp-server dev:sse
 ```
 
 ## Website
+
+Official site: https://limitrum.com
 
 ```bash
 pnpm --filter @limitrum/web dev

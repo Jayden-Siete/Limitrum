@@ -2,6 +2,7 @@
   "name": "@limitrum/web",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://limitrum.com",
   "type": "module",
   "scripts": {
     "dev": "vite",

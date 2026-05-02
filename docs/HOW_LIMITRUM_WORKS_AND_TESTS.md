@@ -97,6 +97,8 @@ pnpm --filter @limitrum/mcp-server dev:sse
 
 ## Run The Website
 
+Official site: https://limitrum.com
+
 ```bash
 pnpm --filter @limitrum/web dev
 ```

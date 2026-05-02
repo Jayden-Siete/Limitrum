@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react';
-import { ArrowRight } from 'lucide-react';
+import { ArrowRight, Github } from 'lucide-react';
 
 export default function CTASection() {
   const sectionRef = useRef<HTMLElement>(null);
@@ -48,10 +48,13 @@ export default function CTASection() {
               <ArrowRight className="w-5 h-5" />
             </a>
             <a
-              href="#demo"
+              href="https://github.com/Jayden-Siete/Limitrum"
+              target="_blank"
+              rel="noopener noreferrer"
               className="inline-flex items-center justify-center gap-2 px-8 py-4 border-2 border-border text-foreground font-semibold rounded-xl hover:border-limitrum-steel/40 hover:bg-limitrum-steel/5 transition-all text-lg"
             >
-              Visit the App
+              <Github className="w-5 h-5" />
+              GitHub
             </a>
           </div>
 

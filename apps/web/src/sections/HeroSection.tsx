@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { ArrowRight, Shield, Zap, Lock } from 'lucide-react';
+import { ArrowRight, Shield, Zap, Lock, Github } from 'lucide-react';
 
 const terminalLines = [
   { text: '$ npm install @limitrum/sdk', type: 'cmd', delay: 0 },
@@ -97,10 +97,13 @@ export default function HeroSection() {
                 <ArrowRight className="w-4 h-4" />
               </a>
               <a
-                href="#solution"
+                href="https://github.com/Jayden-Siete/Limitrum"
+                target="_blank"
+                rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 px-6 py-3 border border-border text-foreground font-medium rounded-xl hover:bg-muted transition-all duration-300 text-sm"
               >
-                How it Works
+                <Github className="w-4 h-4" />
+                GitHub
               </a>
             </div>
 

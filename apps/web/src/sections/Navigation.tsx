@@ -1,5 +1,5 @@
 import { useEffect, useRef, useState } from 'react';
-import { Sun, Moon, Menu, X } from 'lucide-react';
+import { Sun, Moon, Menu, X, Github } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
 
 const navLinks = [
@@ -85,6 +85,15 @@ export default function Navigation() {
             >
               Try Sandbox
             </a>
+            <a
+              href="https://github.com/Jayden-Siete/Limitrum"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="hidden sm:inline-flex items-center gap-2 px-4 py-2 border border-border text-foreground text-sm font-semibold rounded-lg hover:bg-muted transition-all duration-300"
+            >
+              <Github className="w-4 h-4" />
+              GitHub
+            </a>
 
             {/* Mobile menu */}
             <button
@@ -109,6 +118,15 @@ export default function Navigation() {
                 {link.label}
               </a>
             ))}
+            <a
+              href="https://github.com/Jayden-Siete/Limitrum"
+              target="_blank"
+              rel="noopener noreferrer"
+              onClick={() => setMobileOpen(false)}
+              className="block py-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+            >
+              GitHub
+            </a>
           </div>
         )}
       </div>
