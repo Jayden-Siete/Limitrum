@@ -33,7 +33,9 @@
 
 Agents are starting to execute real actions: charge customers, call APIs, mutate data, open tickets, run tools, and trigger workflows.
 
-Limitrum gives those agents a hard runtime boundary:
+I am building Limitrum around a simple belief: autonomous agents should not be trusted only because a prompt says they will behave. Before an agent touches money, data, infrastructure, or an external API, there should be a deterministic policy layer outside the model.
+
+Limitrum gives agents that hard runtime boundary:
 
 ```mermaid
 flowchart LR
@@ -43,7 +45,7 @@ flowchart LR
   Kernel -->|BLOCK| Audit["Reasoned Audit Event"]
 ```
 
-The open-source repo includes the local policy kernel, SDK adapters, CLI, MCP server, and examples needed to evaluate actions deterministically.
+This open-source repo includes the local policy kernel, SDK adapters, CLI, MCP server, and examples needed to evaluate actions deterministically. The goal is to make the core security primitive easy to inspect, test, and extend before teams decide to run it in production.
 
 ## Open-Core Boundary
 
@@ -79,6 +81,16 @@ See [docs/COMMERCIAL_BOUNDARY.md](docs/COMMERCIAL_BOUNDARY.md) for the product b
 - **Tool boundary**: block dangerous actions such as unknown domains, process spawn, destructive mutations, and data exfiltration.
 - **Audit trail**: every decision can be logged locally with the reason and guard that fired.
 - **Agent-native**: wraps OpenAI, Anthropic, LangChain, MCP, and custom tool calls.
+
+## Current Status
+
+Limitrum is an alpha MVP. It is ready for developers to clone, run locally, inspect, and test against real agent-tool flows. The hosted cloud product is intentionally not part of this public repo yet; this repository is the foundation and proof of the policy-kernel model.
+
+The fastest way to verify that the MVP works end to end:
+
+```bash
+pnpm smoke:mvp
+```
 
 ## Quickstart
 
