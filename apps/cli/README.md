@@ -7,12 +7,10 @@ pnpm add -D @limitrum/cli
 ```
 
 ```bash
-limitrum verify \
-  --agent-id agent_sales_01 \
-  --action openai.chat.completions.create \
-  --target api.openai.com/v1/chat/completions \
-  --amount 1
+limitrum simulate --requests 4 --amount 1
 ```
+
+The standalone CLI creates its local tables automatically. For seeded demo policies such as `agent_sales_01`, clone the repo and run `pnpm db:migrate && pnpm db:seed`.
 
 Useful commands:
 

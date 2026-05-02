@@ -9,7 +9,6 @@ permissions:
   contents: write
 
 jobs:
-  # ── Create GitHub Release ──────────────────────────────────────────────────
   release:
     name: Create Release
     runs-on: ubuntu-latest
@@ -44,11 +43,11 @@ jobs:
           body: |
             ## Limitrum v${{ steps.version.outputs.VERSION }}
 
-            The safety engine for autonomous systems.
+            Policy kernel for autonomous AI agents.
 
             ### Installation
             ```bash
-            pnpm add @limitrum/sdk
+            pnpm add @limitrum/sdk @limitrum/db
             ```
 
             ### What's Changed

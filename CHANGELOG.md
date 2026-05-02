@@ -33,6 +33,8 @@ No unreleased changes yet.
 - Repositioned the public repository as the open-source core.
 - Replaced the public website with the new Limitrum Vite landing site.
 - Clarified the commercial boundary for hosted Cloud/API/dashboard capabilities.
+- Clarified standalone CLI npm quickstart behavior.
+- Cleaned the release workflow copy and install instructions.
 - Removed hosted API implementation, Cloud Run deployment files, production runbook, and API integration tests from the public repo.
 
 [Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.0...HEAD

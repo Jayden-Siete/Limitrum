@@ -107,12 +107,10 @@ For the CLI:
 
 ```bash
 pnpm add -D @limitrum/cli
-pnpm exec limitrum verify \
-  --agent-id agent_sales_01 \
-  --action openai.chat.completions.create \
-  --target api.openai.com/v1/chat/completions \
-  --amount 1
+pnpm exec limitrum simulate --requests 4 --amount 1
 ```
+
+The standalone CLI bootstraps its local tables automatically. Use the repo setup below when you want the seeded `agent_sales_01` policy and the full allow/block verification path.
 
 Published packages:
 
