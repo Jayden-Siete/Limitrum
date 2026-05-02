@@ -69,6 +69,7 @@ test-results/
 tmp
 .firebase/
 .claude/
+.private/
 
 # Local design/source handoff folders and generated media
 New Limitrum Website/

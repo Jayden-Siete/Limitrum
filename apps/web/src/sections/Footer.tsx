@@ -1,5 +1,18 @@
-import { Github, Twitter, Linkedin } from 'lucide-react';
+import { Github, Linkedin } from 'lucide-react';
 import { useTheme } from '../hooks/useTheme';
+
+function XLogo({ className }: { className?: string }) {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      aria-hidden="true"
+      className={className}
+      fill="currentColor"
+    >
+      <path d="M13.86 10.47 21.13 2h-1.72l-6.31 7.35L8.06 2H2.25l7.63 11.12L2.25 22h1.72l6.68-7.77L15.98 22h5.81l-7.93-11.53Zm-2.36 2.74-.77-1.1L4.58 3.3h2.65l4.96 7.1.77 1.1 6.45 9.24h-2.65l-5.26-7.53Z" />
+    </svg>
+  );
+}
 
 export default function Footer() {
   const { theme } = useTheme();
@@ -69,7 +82,7 @@ export default function Footer() {
                 <Github className="w-4 h-4" />
               </a>
               <a href="https://x.com/limitrum" target="_blank" rel="noopener noreferrer" aria-label="Limitrum on X" className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-limitrum-steel/10 transition-all">
-                <Twitter className="w-4 h-4" />
+                <XLogo className="w-4 h-4" />
               </a>
               <a href="https://www.linkedin.com/company/limitrum" target="_blank" rel="noopener noreferrer" aria-label="Limitrum on LinkedIn" className="w-9 h-9 rounded-lg bg-muted flex items-center justify-center text-muted-foreground hover:text-foreground hover:bg-limitrum-steel/10 transition-all">
                 <Linkedin className="w-4 h-4" />
