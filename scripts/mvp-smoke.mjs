@@ -3,7 +3,7 @@ import { spawnSync } from "node:child_process";
 const pnpm = process.platform === "win32" ? "pnpm.cmd" : "pnpm";
 
 function run(args, options = {}) {
-const result = spawnSync(pnpm, args, {
+  const result = spawnSync(pnpm, args, {
     cwd: process.cwd(),
     encoding: "utf8",
     shell: process.platform === "win32",
@@ -29,15 +29,15 @@ function extractJson(output) {
 }
 
 console.log("Limitrum MVP smoke test");
-console.log("1/5 building local workspace packages");
+console.log("1/6 building local workspace packages");
 run(["--filter", "@limitrum/db", "build"]);
 run(["--filter", "@limitrum/sdk", "build"]);
 
-console.log("2/5 preparing local policy database");
+console.log("2/6 preparing local policy database");
 run(["db:migrate"]);
 run(["db:seed"]);
 
-console.log("3/5 verifying allowed intent");
+console.log("3/6 verifying allowed intent");
 const allowed = run([
   "--filter",
   "@limitrum/cli",
@@ -58,7 +58,7 @@ if (allowedVerdict.decision !== "allowed") {
   throw new Error(`Expected allowed verdict, got ${allowedVerdict.decision}: ${allowedVerdict.reason}`);
 }
 
-console.log("4/5 verifying blocked exfiltration intent");
+console.log("4/6 verifying blocked exfiltration intent");
 const blocked = run(
   [
     "--filter",
@@ -84,8 +84,11 @@ if (blockedVerdict.decision !== "blocked" || blockedVerdict.guardTriggered !== "
   );
 }
 
-console.log("5/5 running zero-cost agent examples");
+console.log("5/6 running zero-cost agent examples");
 run(["--filter", "@limitrum/example-yolo-agent", "dev"]);
 run(["--filter", "@limitrum/example-mcp-agent", "dev"]);
 
-console.log("MVP smoke test passed: SDK, CLI, DB, policy kernel, adapters, and MCP path are usable.");
+console.log("6/6 running protected tool-call example");
+run(["example:protected-tool"]);
+
+console.log("MVP smoke test passed: SDK, CLI, DB, policy kernel, adapters, MCP path, and protected tool calls are usable.");

@@ -1,6 +1,6 @@
 {
   "name": "@limitrum/sdk",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "license": "MIT",
   "description": "Policy kernel SDK for verifying autonomous AI agent actions before execution.",
@@ -53,7 +53,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@limitrum/db": "workspace:^0.1.0",
+    "@limitrum/db": "workspace:^0.1.1",
     "drizzle-orm": "latest",
     "zod": "latest"
   },

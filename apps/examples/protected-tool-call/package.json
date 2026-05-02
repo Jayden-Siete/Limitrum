@@ -1,5 +1,5 @@
 {
-  "name": "@limitrum/example-mcp-agent",
+  "name": "@limitrum/example-protected-tool-call",
   "version": "0.1.1",
   "private": true,
   "type": "module",
@@ -10,7 +10,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@modelcontextprotocol/sdk": "latest"
+    "@limitrum/db": "workspace:*",
+    "@limitrum/sdk": "workspace:*"
   },
   "devDependencies": {
     "@types/node": "latest",

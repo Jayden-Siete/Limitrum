@@ -24,7 +24,7 @@ const guard = new LimitrumGuard();
 program
   .name("limitrum")
   .description("Limitrum CLI — deterministic safety for autonomous agents")
-  .version("0.1.0");
+  .version("0.1.1");
 
 program.hook("preAction", async () => {
   await bootstrapSchema();

@@ -48,6 +48,14 @@ Try a stricter run:
 pnpm --filter @limitrum/cli dev simulate --requests 20 --amount 50
 ```
 
+## Run A Protected Tool Call
+
+```bash
+pnpm example:protected-tool
+```
+
+This creates a local policy, runs one allowed action, then shows blocked verdicts for a high-cost action and a non-allowlisted domain.
+
 ## Verify One Intent
 
 Allowed target:
@@ -126,6 +134,7 @@ Ready for public developer demos:
 - MCP server exposes a guard tool
 - local audit and budget behavior are testable
 - `pnpm smoke:mvp` validates the MVP path end to end
+- `pnpm example:protected-tool` shows the allow/block flow around a mocked sensitive tool call
 
 Commercial roadmap:
 

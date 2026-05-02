@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 No unreleased changes yet.
 
+## [0.1.1] - 2026-05-02
+
+### Added
+
+- `docs/INTEGRATE_IN_5_MINUTES.md` for SDK, OpenAI adapter, and MCP integration paths.
+- Protected tool-call example showing allowed and blocked verdicts.
+- GitHub integration feedback issue template.
+
+### Changed
+
+- Updated package metadata for the official site.
+- Prepared npm packages for `0.1.1`.
+
 ## [0.1.0] - 2026-05-02
 
 ### Added
@@ -37,5 +50,6 @@ No unreleased changes yet.
 - Cleaned the release workflow copy and install instructions.
 - Removed hosted API implementation, Cloud Run deployment files, production runbook, and API integration tests from the public repo.
 
-[Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.0...HEAD
+[Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.1...HEAD
+[0.1.1]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.0

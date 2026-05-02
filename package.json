@@ -1,6 +1,6 @@
 {
   "name": "limitrum",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": true,
   "packageManager": "pnpm@10.23.0",
   "scripts": {
@@ -9,6 +9,7 @@
     "lint": "turbo run lint",
     "typecheck": "turbo run typecheck",
     "test:unit": "pnpm --filter @limitrum/tests test:unit",
+    "example:protected-tool": "pnpm --filter @limitrum/example-protected-tool-call dev",
     "db:migrate": "pnpm --filter @limitrum/db migrate",
     "db:seed": "pnpm --filter @limitrum/db seed",
     "smoke:mvp": "node scripts/mvp-smoke.mjs",

@@ -1,6 +1,6 @@
 {
   "name": "@limitrum/cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "license": "MIT",
   "description": "Command-line simulator and local policy tools for Limitrum.",
@@ -36,8 +36,8 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@limitrum/db": "workspace:^0.1.0",
-    "@limitrum/sdk": "workspace:^0.1.0",
+    "@limitrum/db": "workspace:^0.1.1",
+    "@limitrum/sdk": "workspace:^0.1.1",
     "commander": "latest"
   },
   "devDependencies": {

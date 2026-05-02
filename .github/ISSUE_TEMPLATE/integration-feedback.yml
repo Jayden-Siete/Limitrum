@@ -1,0 +1,41 @@
+name: Integration feedback
+description: Share feedback from trying Limitrum in an agent or tool workflow.
+title: "[Integration feedback]: "
+labels:
+  - integration-feedback
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for trying Limitrum. Concrete integration feedback is the most useful signal right now.
+  - type: input
+    id: integration
+    attributes:
+      label: Integration path
+      description: Which path did you try?
+      placeholder: SDK local, CLI, MCP server, OpenAI adapter, Anthropic adapter, LangChain adapter
+    validations:
+      required: true
+  - type: textarea
+    id: use-case
+    attributes:
+      label: Use case
+      description: What kind of agent/tool action were you trying to guard?
+      placeholder: Payment action, GitHub tool, data export, internal API call, shell/tool execution
+    validations:
+      required: true
+  - type: textarea
+    id: result
+    attributes:
+      label: What happened?
+      description: Share the command, code snippet, verdict, error, or missing piece.
+      render: shell
+    validations:
+      required: true
+  - type: textarea
+    id: expectation
+    attributes:
+      label: What did you expect?
+      description: What would have made the integration clearer or more useful?
+    validations:
+      required: false

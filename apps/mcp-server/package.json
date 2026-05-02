@@ -1,6 +1,6 @@
 {
   "name": "@limitrum/mcp-server",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "license": "MIT",
   "description": "MCP server exposing Limitrum policy verification as an agent tool.",
@@ -33,7 +33,7 @@
     "typecheck": "tsc -p tsconfig.json --noEmit"
   },
   "dependencies": {
-    "@limitrum/sdk": "workspace:^0.1.0",
+    "@limitrum/sdk": "workspace:^0.1.1",
     "@modelcontextprotocol/sdk": "latest",
     "cross-env": "latest",
     "hono": "latest",

@@ -6,7 +6,7 @@ export function createLimitrumMcpServer() {
   const server = new Server(
     {
       name: "limitrum-mcp-server",
-      version: "0.1.0",
+      version: "0.1.1",
     },
     {
       capabilities: {

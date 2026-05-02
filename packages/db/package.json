@@ -1,6 +1,6 @@
 {
   "name": "@limitrum/db",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "private": false,
   "license": "MIT",
   "description": "Local SQLite/libSQL policy and audit store for Limitrum.",
