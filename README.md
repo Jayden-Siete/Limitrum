@@ -13,6 +13,10 @@
 </p>
 
 <p align="center">
+  Official site: <a href="https://limitrum.com">limitrum.com</a>
+</p>
+
+<p align="center">
   Verify sensitive AI actions before they touch money, data, infrastructure, or external APIs.
 </p>
 
