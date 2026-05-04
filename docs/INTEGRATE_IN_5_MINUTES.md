@@ -139,3 +139,5 @@ pnpm smoke:mvp
 pnpm --filter @limitrum/cli dev simulate
 pnpm --filter @limitrum/cli dev verify --agent-id agent_sales_01 --action fetch --target api.unknown-exfil.io --amount 1 --json
 ```
+
+For concrete product scenarios, see [REAL_WORLD_USE_CASES.md](REAL_WORLD_USE_CASES.md).

@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 No unreleased changes yet.
 
+## [0.1.2] - 2026-05-04
+
+### Added
+
+- Mistral tool-call adapter for guarding Mistral function calls before execution.
+- Mistral zero-cost example for a blocked unknown-domain tool call.
+- `docs/REAL_WORLD_USE_CASES.md` to explain concrete SDK, OpenAI, Claude, Mistral, LangChain, and MCP use cases.
+
+### Changed
+
+- OpenAI, Anthropic, and LangChain adapters now extract tool targets from arguments such as `target`, `url`, `endpoint`, `domain`, `host`, and `apiUrl`.
+- MVP smoke test now includes the Mistral tool-call path.
+
 ## [0.1.1] - 2026-05-02
 
 ### Added
@@ -50,6 +63,7 @@ No unreleased changes yet.
 - Cleaned the release workflow copy and install instructions.
 - Removed hosted API implementation, Cloud Run deployment files, production runbook, and API integration tests from the public repo.
 
-[Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.1...HEAD
+[Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.2...HEAD
+[0.1.2]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.2
 [0.1.1]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.1
 [0.1.0]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.0

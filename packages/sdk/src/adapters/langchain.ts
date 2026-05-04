@@ -40,6 +40,20 @@ function extractAmount(input: unknown) {
   return 0;
 }
 
+function extractTarget(input: unknown, fallbackTarget: string) {
+  if (!input || typeof input !== "object") {
+    return fallbackTarget;
+  }
+  const inputObj = input as Record<string, unknown>;
+  for (const key of ["target", "url", "endpoint", "domain", "host", "apiUrl"]) {
+    const value = inputObj[key];
+    if (typeof value === "string" && value.trim() !== "") {
+      return value;
+    }
+  }
+  return fallbackTarget;
+}
+
 function getExecutor<TInput, TOutput>(tool: ToolLike<TInput, TOutput>) {
   if (typeof tool.invoke === "function") {
     return { kind: "invoke" as const, fn: tool.invoke.bind(tool) };
@@ -63,10 +77,11 @@ export function withLimitrumTool<TInput = unknown, TOutput = unknown>(
 
   const wrappedExecutor = async (input: TInput) => {
     const amount = extractAmount(input);
+    const toolTarget = extractTarget(input, target);
     const verdict = await guard.verify({
       agentId: options.agentId,
       action: `tool:${tool.name}`,
-      target,
+      target: toolTarget,
       amount,
       estimatedCostUsd: amount,
       metadata: {

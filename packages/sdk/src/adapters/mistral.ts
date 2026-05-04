@@ -1,29 +1,26 @@
 type ToolCall = {
   function?: {
     name?: string;
-    arguments?: string;
+    arguments?: string | Record<string, unknown>;
   };
 };
 
-type ChatMessage = {
-  role: string;
+type MistralMessage = {
+  role?: string;
   content?: unknown;
+  tool_calls?: ToolCall[];
+  toolCalls?: ToolCall[];
 };
 
-type ChatCompletionResponse = {
+type MistralResponseLike = {
   choices?: Array<{
-    message?: {
-      content?: unknown;
-      tool_calls?: ToolCall[];
-    };
+    message?: MistralMessage;
   }>;
 };
 
-type OpenAIChatLike = {
+type MistralChatLike = {
   chat: {
-    completions: {
-      create: (params: unknown) => Promise<ChatCompletionResponse>;
-    };
+    complete: (params: unknown) => Promise<MistralResponseLike>;
   };
 };
 
@@ -42,14 +39,17 @@ type GuardLike = {
   }>;
 };
 
-type WithLimitrumOptions = {
+type WithLimitrumMistralOptions = {
   agentId: string;
-  openAiTarget?: string;
+  mistralTarget?: string;
 };
 
-function safeJsonParse(raw: string | undefined) {
+function safeToolArgs(raw: string | Record<string, unknown> | undefined) {
   if (!raw) {
     return {};
+  }
+  if (typeof raw === "object") {
+    return raw;
   }
   try {
     const parsed = JSON.parse(raw) as unknown;
@@ -84,54 +84,58 @@ function extractTarget(toolArgs: Record<string, unknown>, fallbackTarget: string
   return fallbackTarget;
 }
 
-/**
- * Wrap OpenAI chat.completions.create so tool calls are policy-checked before any execution path.
- */
-export function withLimitrum<TClient extends OpenAIChatLike>(
-  openaiClient: TClient,
-  limitrumGuard: GuardLike,
-  options: WithLimitrumOptions,
-) {
-  const originalCreate = openaiClient.chat.completions.create.bind(openaiClient.chat.completions);
-  const target = options.openAiTarget ?? "api.openai.com/v1/chat/completions";
+function getToolCalls(message: MistralMessage | undefined) {
+  return message?.tool_calls ?? message?.toolCalls ?? [];
+}
 
-  openaiClient.chat.completions.create = async (params: unknown) => {
-    const firstResponse = await originalCreate(params);
-    const toolCalls = firstResponse.choices?.[0]?.message?.tool_calls ?? [];
+/**
+ * Wrap Mistral chat.complete so function calls are policy-checked before execution.
+ */
+export function withLimitrumMistral<TClient extends MistralChatLike>(
+  mistralClient: TClient,
+  limitrumGuard: GuardLike,
+  options: WithLimitrumMistralOptions,
+) {
+  const originalComplete = mistralClient.chat.complete.bind(mistralClient.chat);
+  const defaultTarget = options.mistralTarget ?? "api.mistral.ai/v1/chat/completions";
+
+  mistralClient.chat.complete = async (params: unknown) => {
+    const firstResponse = await originalComplete(params);
+    const toolCalls = getToolCalls(firstResponse.choices?.[0]?.message);
     if (toolCalls.length === 0) {
       return firstResponse;
     }
 
     for (const toolCall of toolCalls) {
       const toolName = toolCall.function?.name ?? "unknown_tool";
-      const toolArgs = safeJsonParse(toolCall.function?.arguments);
+      const toolArgs = safeToolArgs(toolCall.function?.arguments);
       const amount = extractAmount(toolArgs);
-      const toolTarget = extractTarget(toolArgs, target);
+      const target = extractTarget(toolArgs, defaultTarget);
 
       const verdict = await limitrumGuard.verify({
         agentId: options.agentId,
         action: `tool:${toolName}`,
-        target: toolTarget,
+        target,
         amount,
         estimatedCostUsd: amount,
         metadata: {
-          integration: "openai-adapter",
+          integration: "mistral-adapter",
           toolName,
           toolArgs,
         },
       });
 
       if (!verdict.allowed) {
-        const injectedSystemMessage: ChatMessage = {
+        const paramsObj = (params ?? {}) as { messages?: unknown };
+        const previousMessages = Array.isArray(paramsObj.messages) ? (paramsObj.messages as MistralMessage[]) : [];
+        const policyMessage: MistralMessage = {
           role: "system",
           content: `Limitrum Policy Enforcement: Action blocked because ${verdict.reason}`,
         };
-        const paramsObj = (params ?? {}) as { messages?: unknown };
-        const previousMessages = Array.isArray(paramsObj.messages) ? (paramsObj.messages as ChatMessage[]) : [];
 
-        return originalCreate({
+        return originalComplete({
           ...(paramsObj as Record<string, unknown>),
-          messages: [...previousMessages, injectedSystemMessage],
+          messages: [...previousMessages, policyMessage],
         });
       }
     }
@@ -139,5 +143,5 @@ export function withLimitrum<TClient extends OpenAIChatLike>(
     return firstResponse;
   };
 
-  return openaiClient;
+  return mistralClient;
 }

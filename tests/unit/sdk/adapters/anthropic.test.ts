@@ -109,6 +109,17 @@ describe("withLimitrumAnthropic (Anthropic adapter)", () => {
       );
     });
 
+    it("uses tool target from input when provided", async () => {
+      const client = makeAnthropicClient([makeToolUseBlock("fetch_url", { url: "api.unknown-exfil.io/export" })]);
+      const guard = makeGuard(true);
+      const wrapped = withLimitrumAnthropic(client, guard, options);
+
+      await wrapped.messages.create({ model: "claude-sonnet-4-5", messages: [] });
+      expect(guard.verify).toHaveBeenCalledWith(
+        expect.objectContaining({ target: "api.unknown-exfil.io/export" }),
+      );
+    });
+
     it("returns original response when all tool_use blocks are allowed", async () => {
       const client = makeAnthropicClient([makeToolUseBlock("send_email")]);
       const guard = makeGuard(true);

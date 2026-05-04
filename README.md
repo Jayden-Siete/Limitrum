@@ -23,7 +23,7 @@
 <p align="center">
   <a href="https://limitrum.com">Website</a>
   ·
-  <a href="https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.1">Release</a>
+  <a href="https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.2">Release</a>
   ·
   <a href="https://www.npmjs.com/package/@limitrum/sdk">npm</a>
 </p>
@@ -114,6 +114,7 @@ pnpm --filter @limitrum/cli dev verify --agent-id agent_sales_01 --action fetch 
 ```
 
 For the shortest integration path, see [docs/INTEGRATE_IN_5_MINUTES.md](docs/INTEGRATE_IN_5_MINUTES.md).
+For product-level examples, see [docs/REAL_WORLD_USE_CASES.md](docs/REAL_WORLD_USE_CASES.md).
 
 ## Quickstart
 
@@ -241,6 +242,7 @@ apps/
     yolo-agent/        Zero-cost OpenAI adapter simulation
     mcp-agent/         Zero-cost MCP client simulation
     protected-tool-call/
+    mistral-tool-call/
 packages/
   db/                  SQLite schema, migrations, seed data
   sdk/                 Policy kernel, guards, adapters

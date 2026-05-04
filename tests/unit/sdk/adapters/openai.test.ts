@@ -124,6 +124,17 @@ describe("withLimitrum (OpenAI adapter)", () => {
       );
     });
 
+    it("uses tool target from arguments when provided", async () => {
+      const client = makeOpenAIClient([makeToolCall("fetch_url", { url: "api.unknown-exfil.io/export" })]);
+      const guard = makeGuard(true);
+      const wrapped = withLimitrum(client, guard, options);
+
+      await wrapped.chat.completions.create({ model: "gpt-4o", messages: [] });
+      expect(guard.verify).toHaveBeenCalledWith(
+        expect.objectContaining({ target: "api.unknown-exfil.io/export" }),
+      );
+    });
+
     it("returns original response when all tool calls are allowed", async () => {
       const client = makeOpenAIClient([makeToolCall("send_email")]);
       const guard = makeGuard(true);

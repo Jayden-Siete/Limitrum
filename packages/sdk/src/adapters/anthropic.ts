@@ -55,6 +55,16 @@ function extractAmount(args: Record<string, unknown>) {
   return 0;
 }
 
+function extractTarget(args: Record<string, unknown>, fallbackTarget: string) {
+  for (const key of ["target", "url", "endpoint", "domain", "host", "apiUrl"]) {
+    const value = args[key];
+    if (typeof value === "string" && value.trim() !== "") {
+      return value;
+    }
+  }
+  return fallbackTarget;
+}
+
 /**
  * Wrap Anthropic messages.create and gate tool_use blocks via Limitrum.
  *
@@ -91,11 +101,12 @@ export function withLimitrumAnthropic<TClient extends AnthropicClientLike>(
     for (const toolUse of toolUses) {
       const toolInput = toolUse.input ?? {};
       const amount = extractAmount(toolInput);
+      const toolTarget = extractTarget(toolInput, target);
 
       const verdict = await limitrumGuard.verify({
         agentId: config.agentId,
         action: `tool:${toolUse.name}`,
-        target,
+        target: toolTarget,
         amount,
         estimatedCostUsd: amount,
         metadata: {

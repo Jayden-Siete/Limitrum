@@ -70,6 +70,18 @@ describe("withLimitrumTool (LangChain single tool wrapper)", () => {
       );
     });
 
+    it("uses target from tool input when provided", async () => {
+      const tool = makeTool("fetch_url");
+      const guard = makeGuard(true);
+      const wrapped = withLimitrumTool(tool, guard, options);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      await (wrapped as any).invoke({ url: "api.unknown-exfil.io/export" });
+      expect(guard.verify).toHaveBeenCalledWith(
+        expect.objectContaining({ target: "api.unknown-exfil.io/export" }),
+      );
+    });
+
     it("calls original tool.invoke when allowed", async () => {
       const tool = makeTool("search_web");
       const guard = makeGuard(true);

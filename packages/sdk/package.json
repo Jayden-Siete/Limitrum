@@ -1,6 +1,6 @@
 {
   "name": "@limitrum/sdk",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "private": false,
   "license": "MIT",
   "description": "Policy kernel SDK for verifying autonomous AI agent actions before execution.",
@@ -44,6 +44,11 @@
       "types": "./dist/adapters/langchain.d.ts",
       "import": "./dist/adapters/langchain.js",
       "default": "./dist/adapters/langchain.js"
+    },
+    "./adapters/mistral": {
+      "types": "./dist/adapters/mistral.d.ts",
+      "import": "./dist/adapters/mistral.js",
+      "default": "./dist/adapters/mistral.js"
     }
   },
   "scripts": {
