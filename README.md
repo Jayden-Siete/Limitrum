@@ -70,7 +70,7 @@ Included here:
 - Local SQLite-backed policy and audit store
 - CLI simulator
 - MCP server for local tool enforcement
-- OpenAI, Anthropic, and LangChain adapters
+- OpenAI, Anthropic, Mistral, and LangChain adapters
 - Zero-cost local examples and tests
 - Public marketing website
 
@@ -93,7 +93,7 @@ See [docs/COMMERCIAL_BOUNDARY.md](docs/COMMERCIAL_BOUNDARY.md) for the product b
 - **Runtime budgets**: cap daily spend, per-action cost, and request rate.
 - **Tool boundary**: block dangerous actions such as unknown domains, process spawn, destructive mutations, and data exfiltration.
 - **Audit trail**: every decision can be logged locally with the reason and guard that fired.
-- **Agent-native**: wraps OpenAI, Anthropic, LangChain, MCP, and custom tool calls.
+- **Agent-native**: wraps OpenAI, Anthropic, Mistral, LangChain, MCP, and custom tool calls.
 
 ## Current Status
 
@@ -102,8 +102,12 @@ Limitrum is an alpha MVP. It is ready for developers to clone, run locally, insp
 The fastest way to verify that the MVP works end to end:
 
 ```bash
+corepack enable
+pnpm install
 pnpm smoke:mvp
 ```
+
+If `pnpm` is not available, run `corepack enable` once or prefix the commands with `npx pnpm`.
 
 ## What To Try First
 
@@ -123,14 +127,14 @@ For product-level examples, see [docs/REAL_WORLD_USE_CASES.md](docs/REAL_WORLD_U
 For an app that wants to integrate the SDK directly:
 
 ```bash
-pnpm add @limitrum/sdk @limitrum/db
+npm install @limitrum/sdk @limitrum/db
 ```
 
 For the CLI:
 
 ```bash
-pnpm add -D @limitrum/cli
-pnpm exec limitrum simulate --requests 4 --amount 1
+npm install -D @limitrum/cli
+npx limitrum simulate --requests 4 --amount 1
 ```
 
 The standalone CLI bootstraps its local tables automatically. Use the repo setup below when you want the seeded `agent_sales_01` policy and the full allow/block verification path.
@@ -149,6 +153,7 @@ Published packages:
 ```bash
 git clone https://github.com/Jayden-Siete/Limitrum.git
 cd Limitrum
+corepack enable
 pnpm install
 ```
 

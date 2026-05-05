@@ -7,9 +7,12 @@ Limitrum sits before sensitive tool execution. Your app sends an intent, the pol
 ```bash
 git clone https://github.com/Jayden-Siete/Limitrum.git
 cd Limitrum
+corepack enable
 pnpm install
 pnpm smoke:mvp
 ```
+
+If `pnpm` is not available, run `corepack enable` once or use `npx pnpm` in place of `pnpm`.
 
 ## 2. Try A Protected Tool Call
 
@@ -34,7 +37,7 @@ BLOCK fetch unknown domain ... guard=domain-allowlist
 ## 3. Use The SDK Directly
 
 ```bash
-pnpm add @limitrum/sdk @limitrum/db
+npm install @limitrum/sdk @limitrum/db
 ```
 
 ```ts

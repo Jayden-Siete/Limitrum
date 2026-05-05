@@ -156,6 +156,7 @@ The strongest public demo is not a dashboard. It is a terminal recording:
 Use this command set:
 
 ```bash
+corepack enable
 pnpm install
 pnpm smoke:mvp
 pnpm example:protected-tool
