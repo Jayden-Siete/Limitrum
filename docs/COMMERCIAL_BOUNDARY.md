@@ -13,6 +13,7 @@ The MIT-licensed core includes:
 - local SQLite policy and audit store
 - CLI simulator
 - MCP server
+- local HTTP verification gateway
 - OpenAI, Anthropic, and LangChain adapters
 - local examples and unit tests
 
@@ -30,7 +31,7 @@ The hosted product is not part of this repository.
 
 Commercial capabilities include:
 
-- hosted Limitrum Cloud API
+- managed multi-tenant Limitrum Cloud API
 - production dashboard
 - organization and team workspaces
 - hosted API-key lifecycle

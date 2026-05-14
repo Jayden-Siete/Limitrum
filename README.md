@@ -23,7 +23,7 @@
 <p align="center">
   <a href="https://limitrum.com">Website</a>
   |
-  <a href="https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.3">Release</a>
+  <a href="https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.4">Release</a>
   |
   <a href="https://www.npmjs.com/package/@limitrum/sdk">npm</a>
 </p>
@@ -78,13 +78,14 @@ Included here:
 - Local SQLite-backed policy and audit store
 - CLI simulator
 - MCP server for local tool enforcement
+- Local HTTP verification gateway compatible with `LIMITRUM_API_URL`
 - OpenAI, Anthropic, Mistral, and LangChain adapters
 - Zero-cost local examples and tests
 - Public marketing website
 
 Not included here:
 
-- Hosted Limitrum Cloud API
+- Managed multi-tenant Limitrum Cloud API
 - Multi-tenant dashboard
 - hosted API-key lifecycle
 - team workspaces, RBAC, SSO, SCIM
@@ -123,6 +124,7 @@ If `pnpm` is not available, run `corepack enable` once or prefix the commands wi
 ```bash
 pnpm smoke:mvp
 pnpm example:agent-firewall
+pnpm gateway:dev
 pnpm --filter @limitrum/cli dev simulate
 pnpm --filter @limitrum/cli dev verify --agent-id agent_sales_01 --action fetch --target api.unknown-exfil.io --amount 1 --json
 ```
@@ -130,6 +132,7 @@ pnpm --filter @limitrum/cli dev verify --agent-id agent_sales_01 --action fetch 
 For the shortest integration path, see [docs/INTEGRATE_IN_5_MINUTES.md](docs/INTEGRATE_IN_5_MINUTES.md).
 For product-level examples, see [docs/REAL_WORLD_USE_CASES.md](docs/REAL_WORLD_USE_CASES.md).
 For the new tool-call firewall path, see [docs/AGENT_TOOL_FIREWALL.md](docs/AGENT_TOOL_FIREWALL.md).
+For the HTTP gateway path, see [docs/HOSTED_GATEWAY.md](docs/HOSTED_GATEWAY.md).
 
 ## Quickstart
 
@@ -278,6 +281,7 @@ docs/
   ARCHITECTURE.md      Runtime model and guard flow
   COMMERCIAL_BOUNDARY.md
   AGENT_TOOL_FIREWALL.md
+  HOSTED_GATEWAY.md
   HOW_LIMITRUM_WORKS_AND_TESTS.md
   INTEGRATE_IN_5_MINUTES.md
 ```
@@ -299,6 +303,24 @@ SSE mode:
 ```bash
 pnpm --filter @limitrum/mcp-server dev:sse
 ```
+
+The same SSE server also exposes a local HTTP verification gateway:
+
+```bash
+pnpm gateway:dev
+
+curl -s http://localhost:8788/v1/verify-intent \
+  -H "Content-Type: application/json" \
+  -d '{"intent":{"agentId":"agent_sales_01","action":"fetch","target":"api.unknown-exfil.io","amount":1}}'
+```
+
+SDK HTTP mode:
+
+```bash
+LIMITRUM_API_URL=http://localhost:8788 node your-agent.js
+```
+
+Set `LIMITRUM_GATEWAY_API_KEY` on the gateway to require `X-Limitrum-API-Key` or `Authorization: Bearer ...`.
 
 ## Website
 

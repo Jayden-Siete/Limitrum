@@ -8,6 +8,19 @@ The format follows [Keep a Changelog](https://keepachangelog.com/en/1.0.0/).
 
 No unreleased changes yet.
 
+## [0.1.4] - 2026-05-14
+
+### Added
+
+- Local HTTP gateway endpoints in `@limitrum/mcp-server`: `/health`, `/v1/openapi.json`, and `POST /v1/verify-intent`.
+- Optional gateway API-key enforcement through `LIMITRUM_GATEWAY_API_KEY`.
+- `docs/HOSTED_GATEWAY.md` for the self-hostable verification API path.
+- Unit tests for the gateway request handler.
+
+### Changed
+
+- `@limitrum/mcp-server` now serves MCP SSE and HTTP verification from the same local server.
+
 ## [0.1.3] - 2026-05-14
 
 ### Added
@@ -78,7 +91,8 @@ No unreleased changes yet.
 - Cleaned the release workflow copy and install instructions.
 - Removed hosted API implementation, Cloud Run deployment files, production runbook, and API integration tests from the public repo.
 
-[Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.3...HEAD
+[Unreleased]: https://github.com/Jayden-Siete/Limitrum/compare/v0.1.4...HEAD
+[0.1.4]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.4
 [0.1.3]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.3
 [0.1.2]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.2
 [0.1.1]: https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.1

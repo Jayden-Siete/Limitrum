@@ -158,10 +158,39 @@ Example MCP tool arguments:
 }
 ```
 
+## 7. Use The HTTP Gateway
+
+Run the local verification API:
+
+```bash
+pnpm gateway:dev
+```
+
+Call the policy kernel over HTTP:
+
+```bash
+curl -s http://localhost:8788/v1/verify-intent \
+  -H "Content-Type: application/json" \
+  -d '{"intent":{"agentId":"agent_sales_01","action":"fetch","target":"api.unknown-exfil.io","amount":1}}'
+```
+
+Point the SDK at the gateway:
+
+```ts
+import { LimitrumGuard } from "@limitrum/sdk";
+
+const guard = new LimitrumGuard({
+  baseUrl: "http://localhost:8788",
+});
+```
+
+For the full gateway path, see [HOSTED_GATEWAY.md](HOSTED_GATEWAY.md).
+
 ## What To Test First
 
 ```bash
 pnpm smoke:mvp
+pnpm gateway:dev
 pnpm --filter @limitrum/cli dev simulate
 pnpm --filter @limitrum/cli dev verify --agent-id agent_sales_01 --action fetch --target api.unknown-exfil.io --amount 1 --json
 ```

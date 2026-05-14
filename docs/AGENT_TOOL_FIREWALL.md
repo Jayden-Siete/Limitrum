@@ -125,6 +125,20 @@ Arguments:
 
 In an MCP setup, the agent or gateway calls `limitrum_guard` before sensitive tools. If the verdict is blocked, the sensitive tool is not called.
 
+The same server can also run as a local HTTP verification gateway:
+
+```bash
+pnpm gateway:dev
+```
+
+```bash
+curl -s http://localhost:8788/v1/verify-intent \
+  -H "Content-Type: application/json" \
+  -d '{"intent":{"agentId":"agent_sales_01","action":"fetch","target":"api.unknown-exfil.io","amount":1}}'
+```
+
+See `docs/HOSTED_GATEWAY.md` for the complete HTTP path.
+
 The next commercial-grade step is a full MCP proxy that sits between an agent and a set of real MCP servers:
 
 ```text

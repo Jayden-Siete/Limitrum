@@ -1,6 +1,6 @@
 {
   "name": "limitrum",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "packageManager": "pnpm@10.23.0",
   "scripts": {
@@ -15,6 +15,7 @@
     "db:seed": "pnpm --filter @limitrum/db seed",
     "smoke:mvp": "node scripts/mvp-smoke.mjs",
     "example:agent-firewall": "pnpm --filter @limitrum/example-agent-tool-firewall dev",
+    "gateway:dev": "pnpm --filter @limitrum/mcp-server dev:sse",
     "hosting:prepare": "node scripts/prepare-hosting.mjs",
     "ci": "pnpm db:migrate && pnpm db:seed && pnpm --filter @limitrum/db build && pnpm --filter @limitrum/sdk build && pnpm typecheck && pnpm test:unit && pnpm build && pnpm smoke:mvp",
     "format": "turbo run format"
