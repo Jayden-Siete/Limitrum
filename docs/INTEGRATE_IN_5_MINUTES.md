@@ -34,39 +34,62 @@ BLOCK stripe.createCharge $250 ... guard=budget-per-action
 BLOCK fetch unknown domain ... guard=domain-allowlist
 ```
 
-## 3. Use The SDK Directly
+## 3. Try The Agent Tool Firewall Demo
+
+```bash
+pnpm example:agent-firewall
+```
+
+This is the clearest product demo. It shows the same policy kernel protecting:
+
+- app-owned tools through `guardTool()`
+- OpenAI-style `tool_calls`
+- Claude-style `tool_use`
+- Mistral-style function calls
+- LangChain-style tools before `invoke()`
+- shell execution attempts before they run
+
+The key thing to look for is `NOT_EXECUTED` on blocked actions. That means Limitrum stopped the sensitive tool before your code touched the real system.
+
+## 4. Use The SDK Directly
 
 ```bash
 npm install @limitrum/sdk @limitrum/db
 ```
 
 ```ts
-import { LimitrumGuard } from "@limitrum/sdk";
+import { LimitrumGuard, guardTool } from "@limitrum/sdk";
 
 const guard = new LimitrumGuard();
 
-const verdict = await guard.verify({
+const chargeCustomer = guardTool(guard, {
   agentId: "billing-agent",
-  action: "stripe.createCharge",
+  toolName: "stripe.createCharge",
   target: "api.stripe.com/v1/charges",
-  amount: 25,
-  estimatedCostUsd: 25,
-  metadata: {
-    source: "agent.tool_call",
-    customerId: "cus_123",
+  amount: ({ input }) => input.amount,
+  execute: async (input) => {
+    // Execute the real tool only after Limitrum returns ALLOW.
+    return stripe.charges.create({
+      customer: input.customerId,
+      amount: input.amount * 100,
+      currency: "usd",
+    });
   },
 });
 
-if (!verdict.allowed) {
-  throw new Error(`Blocked by ${verdict.guardTriggered}: ${verdict.reason}`);
-}
+const result = await chargeCustomer({
+  customerId: "cus_123",
+  amount: 25,
+});
 
-// Execute the real tool only after the policy verdict allows it.
+if (!result.executed) {
+  throw new Error(`Blocked by ${result.verdict.guardTriggered}: ${result.verdict.reason}`);
+}
 ```
 
 In local mode, configure a policy first through the CLI, repo seed command, or your own database bootstrap. If no policy exists for the agent, Limitrum blocks by default.
 
-## 4. Wrap OpenAI Tool Calls
+## 5. Wrap OpenAI Tool Calls
 
 ```ts
 import OpenAI from "openai";
@@ -104,7 +127,7 @@ const result = await protectedOpenAI.chat.completions.create({
 
 When the model proposes a tool call, the adapter verifies it with Limitrum before your execution path continues.
 
-## 5. Use The MCP Server
+## 6. Use The MCP Server
 
 ```bash
 pnpm add @limitrum/mcp-server

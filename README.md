@@ -22,9 +22,9 @@
 
 <p align="center">
   <a href="https://limitrum.com">Website</a>
-  ·
-  <a href="https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.2">Release</a>
-  ·
+  |
+  <a href="https://github.com/Jayden-Siete/Limitrum/releases/tag/v0.1.3">Release</a>
+  |
   <a href="https://www.npmjs.com/package/@limitrum/sdk">npm</a>
 </p>
 
@@ -57,6 +57,14 @@ flowchart LR
   Kernel -->|ALLOW| Tool["Tool / API / Workflow"]
   Kernel -->|BLOCK| Audit["Reasoned Audit Event"]
 ```
+
+In product terms:
+
+```text
+AI agent -> Limitrum -> tool/API/database/shell
+```
+
+The model can propose an action. Limitrum decides whether that action is allowed to execute.
 
 This open-source repo includes the local policy kernel, SDK adapters, CLI, MCP server, and examples needed to evaluate actions deterministically. The goal is to make the core security primitive easy to inspect, test, and extend before teams decide to run it in production.
 
@@ -94,6 +102,7 @@ See [docs/COMMERCIAL_BOUNDARY.md](docs/COMMERCIAL_BOUNDARY.md) for the product b
 - **Tool boundary**: block dangerous actions such as unknown domains, process spawn, destructive mutations, and data exfiltration.
 - **Audit trail**: every decision can be logged locally with the reason and guard that fired.
 - **Agent-native**: wraps OpenAI, Anthropic, Mistral, LangChain, MCP, and custom tool calls.
+- **Drop-in tool firewall**: `guardTool()` protects app-owned functions before they touch Stripe, GitHub, shell, databases, or internal APIs.
 
 ## Current Status
 
@@ -113,12 +122,14 @@ If `pnpm` is not available, run `corepack enable` once or prefix the commands wi
 
 ```bash
 pnpm smoke:mvp
+pnpm example:agent-firewall
 pnpm --filter @limitrum/cli dev simulate
 pnpm --filter @limitrum/cli dev verify --agent-id agent_sales_01 --action fetch --target api.unknown-exfil.io --amount 1 --json
 ```
 
 For the shortest integration path, see [docs/INTEGRATE_IN_5_MINUTES.md](docs/INTEGRATE_IN_5_MINUTES.md).
 For product-level examples, see [docs/REAL_WORLD_USE_CASES.md](docs/REAL_WORLD_USE_CASES.md).
+For the new tool-call firewall path, see [docs/AGENT_TOOL_FIREWALL.md](docs/AGENT_TOOL_FIREWALL.md).
 
 ## Quickstart
 
@@ -216,23 +227,32 @@ pnpm smoke:mvp
 ## SDK Example
 
 ```ts
-import { LimitrumGuard } from "@limitrum/sdk";
+import { LimitrumGuard, guardTool } from "@limitrum/sdk";
 
 const guard = new LimitrumGuard();
 
-const verdict = await guard.verify({
+const chargeCustomer = guardTool(guard, {
   agentId: "billing-agent",
-  action: "stripe.createCharge",
+  toolName: "stripe.createCharge",
   target: "api.stripe.com/v1/charges",
-  estimatedCostUsd: 50,
-  metadata: {
-    customerId: "cus_123",
-    source: "agent.tool_call",
+  amount: ({ input }) => input.amount,
+  execute: async (input) => {
+    // Real Stripe call goes here. It only runs after Limitrum returns ALLOW.
+    return {
+      chargeId: "ch_mocked",
+      customerId: input.customerId,
+      amount: input.amount,
+    };
   },
 });
 
-if (!verdict.allowed) {
-  throw new Error(`Blocked by ${verdict.guardTriggered}: ${verdict.reason}`);
+const result = await chargeCustomer({
+  customerId: "cus_123",
+  amount: 50,
+});
+
+if (!result.executed) {
+  throw new Error(`Blocked by ${result.verdict.guardTriggered}: ${result.verdict.reason}`);
 }
 ```
 
@@ -244,6 +264,7 @@ apps/
   mcp-server/          MCP tool server for local agent enforcement
   web/                 Public Limitrum website
   examples/
+    agent-tool-firewall/
     yolo-agent/        Zero-cost OpenAI adapter simulation
     mcp-agent/         Zero-cost MCP client simulation
     protected-tool-call/
@@ -256,6 +277,7 @@ tests/
 docs/
   ARCHITECTURE.md      Runtime model and guard flow
   COMMERCIAL_BOUNDARY.md
+  AGENT_TOOL_FIREWALL.md
   HOW_LIMITRUM_WORKS_AND_TESTS.md
   INTEGRATE_IN_5_MINUTES.md
 ```

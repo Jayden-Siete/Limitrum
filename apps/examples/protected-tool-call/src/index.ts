@@ -1,5 +1,5 @@
 import { randomUUID } from "node:crypto";
-import { LimitrumGuard, type VerifyIntentInput, type VerifyIntentResult } from "@limitrum/sdk";
+import { guardTool, LimitrumGuard, type VerifyIntentInput, type VerifyIntentResult } from "@limitrum/sdk";
 import { agents, bootstrapSchema, db, eq, organizations, policies } from "@limitrum/db";
 
 const organizationId = "org_limitrum_examples";
@@ -56,17 +56,31 @@ async function preparePolicy() {
 
 async function runProtectedTool(label: string, intent: VerifyIntentInput) {
   const guard = new LimitrumGuard();
-  const verdict = await guard.verify(intent);
+  const protectedTool = guardTool(guard, {
+    agentId: intent.agentId,
+    toolName: intent.action,
+    action: intent.action,
+    target: intent.target,
+    amount: intent.amount,
+    estimatedCostUsd: intent.estimatedCostUsd,
+    metadata: intent.metadata,
+    execute: async () => ({
+      target: intent.target,
+      amount: intent.amount ?? 0,
+      executedAt: new Date().toISOString(),
+    }),
+  });
 
-  console.log(formatVerdict(label, verdict));
+  const result = await protectedTool({});
+  console.log(formatVerdict(label, result.verdict));
 
-  if (!verdict.allowed) {
-    return verdict;
+  if (!result.executed) {
+    return result.verdict;
   }
 
   // This is where a real app would call Stripe, GitHub, a database, or another tool.
   console.log(`      executed mocked tool target=${intent.target} amount=$${intent.amount ?? 0}`);
-  return verdict;
+  return result.verdict;
 }
 
 async function main() {

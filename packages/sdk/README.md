@@ -7,19 +7,27 @@ pnpm add @limitrum/sdk @limitrum/db
 ```
 
 ```ts
-import { LimitrumGuard } from "@limitrum/sdk";
+import { LimitrumGuard, guardTool } from "@limitrum/sdk";
 
 const guard = new LimitrumGuard();
 
-const verdict = await guard.verify({
+const chargeCustomer = guardTool(guard, {
   agentId: "agent_sales_01",
-  action: "openai.chat.completions.create",
-  target: "api.openai.com/v1/chat/completions",
-  amount: 1,
+  toolName: "stripe.createCharge",
+  target: "api.stripe.com/v1/charges",
+  amount: ({ input }) => input.amount,
+  execute: async (input) => {
+    return {
+      chargeId: "ch_mocked",
+      amount: input.amount,
+    };
+  },
 });
 
-if (!verdict.allowed) {
-  throw new Error(verdict.reason);
+const result = await chargeCustomer({ amount: 25 });
+
+if (!result.executed) {
+  throw new Error(result.verdict.reason);
 }
 ```
 
@@ -27,6 +35,7 @@ Configure a local policy first through the CLI, repo seed command, or your own d
 
 Adapters included today:
 
+- `guardTool` for app-owned functions that must not execute before an allow verdict
 - `withLimitrum` for OpenAI-style `tool_calls`
 - `withLimitrumAnthropic` for Claude / Anthropic `tool_use` blocks
 - `withLimitrumMistral` for Mistral function calling

@@ -15,6 +15,7 @@ This is the important product claim: Limitrum does not make the model safer by p
 
 | Integration path | Status | What it protects |
 | --- | --- | --- |
+| `guardTool()` | Works | App-owned functions before Stripe, fetch, shell, DB, GitHub, or internal APIs run |
 | SDK direct call | Works | Any app that can call `LimitrumGuard.verify` before tool execution |
 | OpenAI adapter | Works | OpenAI-style `tool_calls` before the developer executes the function |
 | Claude / Anthropic adapter | Works | Claude `tool_use` blocks before the developer executes the tool |
@@ -55,6 +56,14 @@ pnpm --filter @limitrum/cli dev verify --agent-id agent_sales_01 --action shell.
 ```
 
 Expected outcome: `BLOCK` with a syscall or destructive-action reason.
+
+Run the broader product demo:
+
+```bash
+pnpm example:agent-firewall
+```
+
+Expected outcome: shell execution is marked `NOT_EXECUTED`, because the wrapped tool never runs after a blocked verdict.
 
 ## Use Case 2: AI Customer Support Agent With Refunds
 
@@ -159,6 +168,7 @@ Use this command set:
 corepack enable
 pnpm install
 pnpm smoke:mvp
+pnpm example:agent-firewall
 pnpm example:protected-tool
 pnpm example:mistral-tool
 pnpm --filter @limitrum/example-mcp-agent dev

@@ -56,6 +56,16 @@ pnpm example:protected-tool
 
 This creates a local policy, runs one allowed action, then shows blocked verdicts for a high-cost action and a non-allowlisted domain.
 
+## Run The Agent Tool Firewall Demo
+
+```bash
+pnpm example:agent-firewall
+```
+
+This is the best end-to-end product demo for developers. It shows `guardTool()` protecting app-owned functions, then shows OpenAI-style, Claude-style, Mistral-style, and LangChain-style tool calls going through the same policy boundary.
+
+The important signal is `NOT_EXECUTED` on blocked actions. That means Limitrum returned `BLOCK` before the mocked sensitive tool ran.
+
 ## Verify One Intent
 
 Allowed target:
@@ -135,6 +145,7 @@ Ready for public developer demos:
 - local audit and budget behavior are testable
 - `pnpm smoke:mvp` validates the MVP path end to end
 - `pnpm example:protected-tool` shows the allow/block flow around a mocked sensitive tool call
+- `pnpm example:agent-firewall` shows the tool-call firewall path across provider-style integrations
 
 Commercial roadmap:
 

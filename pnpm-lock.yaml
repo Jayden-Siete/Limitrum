@@ -40,6 +40,25 @@ importers:
         specifier: latest
         version: 6.0.3
 
+  apps/examples/agent-tool-firewall:
+    dependencies:
+      '@limitrum/db':
+        specifier: workspace:*
+        version: link:../../../packages/db
+      '@limitrum/sdk':
+        specifier: workspace:*
+        version: link:../../../packages/sdk
+    devDependencies:
+      '@types/node':
+        specifier: latest
+        version: 25.6.0
+      tsx:
+        specifier: latest
+        version: 4.21.0
+      typescript:
+        specifier: latest
+        version: 6.0.3
+
   apps/examples/mcp-agent:
     dependencies:
       '@modelcontextprotocol/sdk':

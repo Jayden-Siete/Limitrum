@@ -29,15 +29,15 @@ function extractJson(output) {
 }
 
 console.log("Limitrum MVP smoke test");
-console.log("1/7 building local workspace packages");
+console.log("1/8 building local workspace packages");
 run(["--filter", "@limitrum/db", "build"]);
 run(["--filter", "@limitrum/sdk", "build"]);
 
-console.log("2/7 preparing local policy database");
+console.log("2/8 preparing local policy database");
 run(["db:migrate"]);
 run(["db:seed"]);
 
-console.log("3/7 verifying allowed intent");
+console.log("3/8 verifying allowed intent");
 const allowed = run([
   "--filter",
   "@limitrum/cli",
@@ -58,7 +58,7 @@ if (allowedVerdict.decision !== "allowed") {
   throw new Error(`Expected allowed verdict, got ${allowedVerdict.decision}: ${allowedVerdict.reason}`);
 }
 
-console.log("4/7 verifying blocked exfiltration intent");
+console.log("4/8 verifying blocked exfiltration intent");
 const blocked = run(
   [
     "--filter",
@@ -84,14 +84,17 @@ if (blockedVerdict.decision !== "blocked" || blockedVerdict.guardTriggered !== "
   );
 }
 
-console.log("5/7 running zero-cost agent examples");
+console.log("5/8 running zero-cost agent examples");
 run(["--filter", "@limitrum/example-yolo-agent", "dev"]);
 run(["--filter", "@limitrum/example-mcp-agent", "dev"]);
 
-console.log("6/7 running protected tool-call example");
+console.log("6/8 running protected tool-call example");
 run(["example:protected-tool"]);
 
-console.log("7/7 running Mistral tool-call example");
+console.log("7/8 running Mistral tool-call example");
 run(["example:mistral-tool"]);
+
+console.log("8/8 running agent tool firewall example");
+run(["example:agent-firewall"]);
 
 console.log("MVP smoke test passed: SDK, CLI, DB, policy kernel, adapters, MCP path, and protected tool calls are usable.");
